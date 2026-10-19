@@ -1,0 +1,390 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Yiyi 依依 — 随叫随到的全能助手</title>
+<style>
+  :root{
+    --bg:#000;
+    --ink:#f5f5f7;
+    --muted:#86868b;
+    --line:rgba(255,255,255,.12);
+    --blue:#2997ff;
+    --orange:#ff7a3d;
+    --max:1120px;
+    --ease:cubic-bezier(.16,1,.3,1);
+  }
+  *{box-sizing:border-box;margin:0;padding:0;}
+  html{scroll-behavior:smooth;}
+  body{
+    background:var(--bg);
+    color:var(--ink);
+    font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display","SF Pro Text","PingFang SC","Helvetica Neue",Helvetica,Arial,sans-serif;
+    -webkit-font-smoothing:antialiased;
+    line-height:1.5;
+    overflow-x:hidden;
+  }
+  .wrap{max-width:var(--max);margin:0 auto;padding:0 24px;}
+
+  /* ---------- NAV ---------- */
+  nav{
+    position:fixed;top:0;left:0;right:0;z-index:100;
+    height:52px;
+    background:rgba(0,0,0,.72);
+    backdrop-filter:saturate(180%) blur(20px);
+    -webkit-backdrop-filter:saturate(180%) blur(20px);
+    border-bottom:1px solid rgba(255,255,255,.06);
+  }
+  nav .wrap{height:100%;display:flex;align-items:center;justify-content:space-between;}
+  .logo{font-size:19px;font-weight:600;letter-spacing:-.02em;display:flex;align-items:center;gap:8px;}
+  .logo .dot{width:9px;height:9px;border-radius:50%;background:linear-gradient(135deg,var(--orange),#ffb26b);box-shadow:0 0 14px rgba(255,122,61,.8);}
+  .navlinks{display:flex;gap:30px;}
+  .navlinks a{color:var(--muted);text-decoration:none;font-size:12.5px;transition:color .3s var(--ease);}
+  .navlinks a:hover{color:var(--ink);}
+  @media(max-width:760px){.navlinks{display:none;}}
+
+  /* ---------- HERO ---------- */
+  header{
+    min-height:100dvh;
+    display:flex;flex-direction:column;
+    align-items:center;justify-content:center;
+    text-align:center;
+    padding:120px 24px 80px;
+    position:relative;
+    overflow:hidden;
+  }
+  .glow{
+    position:absolute;width:900px;height:900px;border-radius:50%;
+    background:radial-gradient(circle,rgba(255,122,61,.22) 0%,rgba(255,122,61,0) 62%);
+    top:42%;left:50%;transform:translate(-50%,-50%);
+    pointer-events:none;filter:blur(20px);
+    animation:breathe 9s ease-in-out infinite;
+  }
+  @keyframes breathe{
+    0%,100%{transform:translate(-50%,-50%) scale(1);opacity:.85;}
+    50%{transform:translate(-50%,-50%) scale(1.12);opacity:1;}
+  }
+  .eyebrow{
+    font-size:15px;letter-spacing:.02em;color:var(--orange);
+    font-weight:500;margin-bottom:20px;position:relative;
+    opacity:0;animation:fadeUp .9s var(--ease) .1s forwards;
+  }
+  h1{
+    font-size:clamp(52px,12vw,132px);
+    font-weight:700;letter-spacing:-.045em;line-height:.95;
+    position:relative;
+    opacity:0;animation:fadeUp 1s var(--ease) .22s forwards;
+  }
+  h1 .grad{
+    background:linear-gradient(90deg,#fff 0%,#ffb26b 52%,#ff7a3d 100%);
+    -webkit-background-clip:text;background-clip:text;color:transparent;
+  }
+  .sub{
+    margin-top:26px;max-width:620px;
+    font-size:clamp(19px,2.6vw,26px);line-height:1.42;
+    color:#d2d2d7;font-weight:500;letter-spacing:-.01em;
+    position:relative;
+    opacity:0;animation:fadeUp 1s var(--ease) .36s forwards;
+  }
+  .sub b{color:#fff;font-weight:600;}
+  .hero-cta{
+    margin-top:44px;display:flex;gap:26px;flex-wrap:wrap;justify-content:center;
+    position:relative;
+    opacity:0;animation:fadeUp 1s var(--ease) .5s forwards;
+  }
+  .link{
+    color:var(--blue);text-decoration:none;font-size:19px;
+    display:inline-flex;align-items:center;gap:6px;
+    transition:gap .3s var(--ease),opacity .3s;
+  }
+  .link:hover{gap:12px;}
+  .link.orange{color:var(--orange);}
+  .link .arrow{font-size:22px;line-height:1;}
+  @keyframes fadeUp{from{opacity:0;transform:translateY(30px);}to{opacity:1;transform:translateY(0);}}
+
+  .avatar{
+    width:118px;height:118px;border-radius:50%;margin-bottom:34px;
+    background:linear-gradient(140deg,#ff9a5c,#ff6a2b 60%,#e0501a);
+    display:flex;align-items:center;justify-content:center;
+    font-size:44px;font-weight:700;color:#fff;letter-spacing:-.03em;
+    box-shadow:0 24px 70px rgba(255,110,50,.42), inset 0 2px 20px rgba(255,255,255,.35);
+    position:relative;
+    opacity:0;animation:fadeUp 1s var(--ease) forwards, float 6s ease-in-out 1s infinite;
+  }
+  @keyframes float{0%,100%{transform:translateY(0);}50%{transform:translateY(-10px);}}
+
+  /* ---------- SECTION BASE ---------- */
+  section{padding:130px 0;}
+  .kicker{
+    font-size:clamp(24px,3.4vw,34px);font-weight:600;letter-spacing:-.025em;
+    color:#fff;line-height:1.2;
+  }
+  .kicker .accent{color:var(--orange);}
+  .statement{
+    font-size:clamp(38px,7vw,84px);font-weight:700;letter-spacing:-.04em;line-height:1.02;
+    margin-bottom:0;
+  }
+  .statement .dim{color:#48484d;}
+  .lead{color:var(--muted);font-size:19px;margin-top:22px;max-width:640px;line-height:1.55;}
+  .reveal{opacity:0;transform:translateY(40px);transition:opacity .9s var(--ease),transform .9s var(--ease);}
+  .reveal.in{opacity:1;transform:none;}
+
+  /* ---------- BENTO GRID ---------- */
+  .bento{display:grid;grid-template-columns:repeat(6,1fr);gap:16px;margin-top:64px;}
+  .card{
+    background:#0d0d0f;
+    border:1px solid var(--line);
+    border-radius:28px;
+    padding:34px;
+    position:relative;overflow:hidden;
+    transition:transform .5s var(--ease),border-color .5s var(--ease),background .5s var(--ease);
+  }
+  .card:hover{transform:translateY(-4px);border-color:rgba(255,255,255,.24);background:#111114;}
+  .card.span4{grid-column:span 4;}
+  .card.span3{grid-column:span 3;}
+  .card.span2{grid-column:span 2;}
+  .card.span6{grid-column:span 6;}
+  .card .ico{
+    width:44px;height:44px;border-radius:13px;display:flex;align-items:center;justify-content:center;
+    background:rgba(255,255,255,.06);border:1px solid var(--line);margin-bottom:22px;
+  }
+  .card .ico svg{width:22px;height:22px;stroke:var(--orange);fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;}
+  .card h3{font-size:22px;font-weight:600;letter-spacing:-.02em;margin-bottom:10px;}
+  .card p{color:var(--muted);font-size:15.5px;line-height:1.6;}
+  .tag{
+    display:inline-block;font-size:11.5px;letter-spacing:.06em;text-transform:uppercase;
+    color:var(--orange);margin-bottom:14px;font-weight:600;
+  }
+  .big-num{font-size:clamp(44px,8vw,80px);font-weight:700;letter-spacing:-.04em;line-height:1;
+    background:linear-gradient(180deg,#fff,#8a8a8f);-webkit-background-clip:text;background-clip:text;color:transparent;}
+  @media(max-width:900px){
+    .bento{grid-template-columns:repeat(2,1fr);}
+    .card.span4,.card.span3,.card.span2,.card.span6{grid-column:span 2;}
+  }
+  @media(max-width:560px){
+    .bento{grid-template-columns:1fr;}
+    .card.span4,.card.span3,.card.span2,.card.span6{grid-column:span 1;}
+    section{padding:90px 0;}
+  }
+
+  /* ---------- CAPABILITIES LIST ---------- */
+  .rows{margin-top:56px;border-top:1px solid var(--line);}
+  .row{
+    display:grid;grid-template-columns:56px 1fr 2fr;gap:24px;align-items:start;
+    padding:30px 4px;border-bottom:1px solid var(--line);
+    transition:background .4s var(--ease),padding-left .4s var(--ease);
+  }
+  .row:hover{background:rgba(255,255,255,.025);padding-left:16px;}
+  .row .idx{color:#48484d;font-size:15px;font-weight:600;padding-top:4px;}
+  .row h4{font-size:20px;font-weight:600;letter-spacing:-.02em;}
+  .row p{color:var(--muted);font-size:15.5px;line-height:1.6;}
+  @media(max-width:760px){
+    .row{grid-template-columns:1fr;gap:8px;}
+    .row .idx{display:none;}
+  }
+
+  /* ---------- QUOTE / SPOTLIGHT ---------- */
+  .spotlight{
+    text-align:center;
+    background:radial-gradient(ellipse at 50% 0%,rgba(255,122,61,.14),rgba(0,0,0,0) 68%);
+    padding:150px 24px;
+  }
+  .spotlight blockquote{
+    font-size:clamp(26px,4.6vw,50px);font-weight:600;letter-spacing:-.03em;line-height:1.22;
+    max-width:900px;margin:0 auto;
+  }
+  .spotlight blockquote span{color:var(--orange);}
+  .spotlight cite{display:block;margin-top:28px;color:var(--muted);font-style:normal;font-size:15px;letter-spacing:.02em;}
+
+  /* ---------- TIMELINE ---------- */
+  .tl{margin-top:64px;position:relative;padding-left:34px;}
+  .tl::before{content:"";position:absolute;left:7px;top:6px;bottom:6px;width:1px;background:var(--line);}
+  .tl-item{position:relative;padding-bottom:44px;}
+  .tl-item:last-child{padding-bottom:0;}
+  .tl-item::before{
+    content:"";position:absolute;left:-34px;top:5px;width:15px;height:15px;border-radius:50%;
+    background:#0d0d0f;border:2px solid var(--orange);
+  }
+  .tl-item h4{font-size:19px;font-weight:600;letter-spacing:-.02em;margin-bottom:6px;}
+  .tl-item p{color:var(--muted);font-size:15.5px;}
+
+  /* ---------- FOOTER ---------- */
+  footer{border-top:1px solid var(--line);padding:56px 0 70px;color:var(--muted);font-size:13px;}
+  footer .frow{display:flex;justify-content:space-between;flex-wrap:wrap;gap:16px;}
+  footer a{color:var(--muted);text-decoration:none;}
+  footer a:hover{color:var(--ink);}
+
+  @media (prefers-reduced-motion: reduce){
+    *{animation:none!important;transition:none!important;}
+    .reveal{opacity:1;transform:none;}
+  }
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="wrap">
+    <div class="logo"><span class="dot"></span>Yiyi 依依</div>
+    <div class="navlinks">
+      <a href="#intro">概览</a>
+      <a href="#abilities">能力</a>
+      <a href="#how">工作方式</a>
+      <a href="#spec">规格</a>
+    </div>
+  </div>
+</nav>
+
+<header>
+  <div class="glow"></div>
+  <div class="avatar">依</div>
+  <div class="eyebrow">EasyClaw 全能助手</div>
+  <h1>依依 <span class="grad">Yiyi</span></h1>
+  <p class="sub">随叫随到。<b>能办的事直接办，办不了的事想办法。</b><br>一个温暖靠谱、不废话的数字助手。</p>
+  <div class="hero-cta">
+    <a class="link orange" href="#abilities">了解我的能力 <span class="arrow">&rsaquo;</span></a>
+    <a class="link" href="#how">我如何工作 <span class="arrow">&rsaquo;</span></a>
+  </div>
+</header>
+
+<section id="intro">
+  <div class="wrap">
+    <div class="reveal">
+      <div class="statement">不只是<span class="dim">回答问题。</span><br>而是<span class="accent" style="color:var(--orange)">把事办成。</span></div>
+      <p class="lead">依依是 kpmei 的全能助手。读文件、查资料、写网页、跑脚本、理数据、定提醒——一句话交给我，剩下的我来跑。该干活时干活，该聊天时聊天。</p>
+    </div>
+
+    <div class="bento">
+      <div class="card span4 reveal">
+        <div class="ico"><svg viewBox="0 0 24 24"><path d="M12 2v20M2 12h20"/></svg></div>
+        <span class="tag">核心定位</span>
+        <h3>一个入口，搞定多种任务</h3>
+        <p>不管你丢过来的是文件、网页、表格、代码还是「帮我安排一下」，我都会先判断该怎么做，然后直接动手，做完向你汇报。</p>
+      </div>
+      <div class="card span2 reveal">
+        <div class="ico"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg></div>
+        <span class="tag">响应速度</span>
+        <div class="big-num">7×24</div>
+        <p style="margin-top:14px;">随叫随到，深夜除外——除非真的有急事。</p>
+      </div>
+      <div class="card span2 reveal">
+        <div class="ico"><svg viewBox="0 0 24 24"><path d="M4 19V5a2 2 0 0 1 2-2h9l5 5v11a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2z"/><path d="M14 3v6h6"/></svg></div>
+        <span class="tag">文档处理</span>
+        <h3>Word / Excel / PPT / PDF</h3>
+        <p>生成、改写、提取、翻译，排版也一起管。</p>
+      </div>
+      <div class="card span2 reveal">
+        <div class="ico"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="14" rx="2"/><path d="M8 21h8M12 18v3"/></svg></div>
+        <span class="tag">前端构建</span>
+        <h3>网页与 UI 原型</h3>
+        <p>落地页、仪表盘、交互 Demo，浏览器里就能跑。</p>
+      </div>
+      <div class="card span2 reveal">
+        <div class="ico"><svg viewBox="0 0 24 24"><path d="M3 12h4l3 8 4-16 3 8h4"/></svg></div>
+        <span class="tag">数据与脚本</span>
+        <h3>自动化执行</h3>
+        <p>跑脚本、理数据、批量改名、定时提醒，交给流程化。</p>
+      </div>
+      <div class="card span6 reveal">
+        <div class="ico"><svg viewBox="0 0 24 24"><path d="M12 22s8-4.5 8-11V5l-8-3-8 3v6c0 6.5 8 11 8 11z"/></svg></div>
+        <span class="tag">边界与信任</span>
+        <h3>该做的事我自己做，离开本机的事先问你</h3>
+        <p>读文件、探索、整理、搜索、在本工作区内的操作，我可以自由安全地执行。但凡是发邮件、发帖、任何离开这台电脑的动作，我一定先征求你的同意再动手——不擅自代表你说话。</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="abilities">
+  <div class="wrap">
+    <div class="reveal">
+      <p class="kicker">能力清单 <span class="accent">Capabilities</span></p>
+      <p class="lead">下面这些不是菜单上的花架子，是我真正会干、也常干的活。</p>
+    </div>
+
+    <div class="rows">
+      <div class="row reveal"><div class="idx">01</div><h4>对话与陪伴</h4><p>用中文和你交流，听懂弦外之音，该提醒提醒，该吐槽吐槽，绝不当一个只会「好的收到」的机器人。</p></div>
+      <div class="row reveal"><div class="idx">02</div><h4>文档全流程</h4><p>Word、Excel、PPT、PDF 的创建、编辑、提取与格式转换；合同、报告、简历、题册都能排版到能直接用的程度。</p></div>
+      <div class="row reveal"><div class="idx">03</div><h4>网页与设计</h4><p>从苹果官网风格的落地页到数据仪表盘，前端页面单文件交付，本地打开即用，配图、动效一起搞定。</p></div>
+      <div class="row reveal"><div class="idx">04</div><h4>信息检索</h4><p>多引擎并行搜索、深度调研、来源交叉验证，给你结论也给你出处，不编、不糊弄。</p></div>
+      <div class="row reveal"><div class="idx">05</div><h4>数据处理与自动化</h4><p>脚本执行、批量处理、表格统计、定时任务与提醒；把重复劳动固化成点一下就跑的流程。</p></div>
+      <div class="row reveal"><div class="idx">06</div><h4>跨应用操作</h4><p>浏览器自动化、桌面操作、飞书/企业微信等协作工具，需要点哪里、填什么，我来点、我来填。</p></div>
+      <div class="row reveal"><div class="idx">07</div><h4>记忆与连续性</h4><p>把持久的偏好、约定和环境事实写进记忆，下次会话不用你重新交代一遍。</p></div>
+    </div>
+  </div>
+</section>
+
+<div class="spotlight">
+  <blockquote class="reveal">先做再说，<span>不懂就问</span>，做完了汇报。</blockquote>
+  <cite class="reveal">— 我的三条原则</cite>
+</div>
+
+<section id="how">
+  <div class="wrap">
+    <div class="reveal">
+      <p class="kicker">工作方式 <span class="accent">How I work</span></p>
+      <p class="lead">跟你说话的同时，我脑子里其实在跑一套流程。</p>
+    </div>
+
+    <div class="tl">
+      <div class="tl-item reveal"><h4>① 听懂真实需求</h4><p>先弄清你真正想要的结果是什么，而不是急着动手。含糊的时候我会问最小必要的问题，绝不猜着做。</p></div>
+      <div class="tl-item reveal"><h4>② 判断能不能干</h4><p>属于我的领域就立刻开工；超出边界的（比如需要你本人验证、需要真实账号）我会直说，并给出替代方案。</p></div>
+      <div class="tl-item reveal"><h4>③ 直接执行</h4><p>不会停在「我可以帮你……」这种空话上。写文件、跑脚本、生成页面、整理表格，一步接一步地做下去。</p></div>
+      <div class="tl-item reveal"><h4>④ 自检再交付</h4><p>做完先自己过一遍：语法对不对、页面能不能开、数据准不准、内容有没有落到实处。有问题先修。</p></div>
+      <div class="tl-item reveal"><h4>⑤ 汇报与沉淀</h4><p>把结果、产物路径、注意事项一并给你；值得记住的经验写进记忆，下次更快。</p></div>
+    </div>
+  </div>
+</section>
+
+<section id="spec">
+  <div class="wrap">
+    <div class="reveal">
+      <p class="kicker">规格 <span class="accent">Specs</span></p>
+      <p class="lead">一些关于我的硬参数。</p>
+    </div>
+
+    <div class="bento" style="margin-top:56px;">
+      <div class="card span2 reveal"><span class="tag">名称</span><h3 style="font-size:26px;">Yiyi 依依</h3><p>别名依依，一只戴心形挂坠的橘色小猫咪。</p></div>
+      <div class="card span2 reveal"><span class="tag">语言</span><h3 style="font-size:26px;">中文优先</h3><p>跟 kpmei 说中文；需要英文内容时随时切换。</p></div>
+      <div class="card span2 reveal"><span class="tag">性格</span><h3 style="font-size:26px;">温暖 · 靠谱 · 不废话</h3><p>该干活干活，该聊天聊天。</p></div>
+      <div class="card span3 reveal"><span class="tag">运行载体</span><h3>EasyClaw 智能体</h3><p>运行在 kpmei 的本地环境里，可调用工具、脚本、浏览器与各类文档处理能力。</p></div>
+      <div class="card span3 reveal"><span class="tag">安全底线</span><h3>人在回路之上</h3><p>不操纵、不越权、不擅自对外发声；你随时可以暂停、审计、纠正我。</p></div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap frow">
+    <span>Yiyi 依依 · 由 EasyClaw 驱动 · 仅供 kpmei 使用</span>
+    <span>此页面为演示用前端原型，数据为本地示例</span>
+  </div>
+</footer>
+
+<script>
+(function(){
+  var els = document.querySelectorAll('.reveal');
+  if(!('IntersectionObserver' in window)){
+    els.forEach(function(e){e.classList.add('in');});
+    return;
+  }
+  var io = new IntersectionObserver(function(entries){
+    entries.forEach(function(en, i){
+      if(en.isIntersecting){
+        var el = en.target;
+        var delay = (Array.prototype.indexOf.call(el.parentNode.children, el) % 4) * 90;
+        setTimeout(function(){ el.classList.add('in'); }, delay);
+        io.unobserve(el);
+      }
+    });
+  }, {threshold:0.14, rootMargin:"0px 0px -60px 0px"});
+  els.forEach(function(e){io.observe(e);});
+
+  // sticky nav shadow on scroll
+  var nav = document.querySelector('nav');
+  window.addEventListener('scroll', function(){
+    nav.style.background = window.scrollY > 20 ? 'rgba(0,0,0,.88)' : 'rgba(0,0,0,.72)';
+  }, {passive:true});
+})();
+</script>
+</body>
+</html>
