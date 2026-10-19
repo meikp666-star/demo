@@ -1,0 +1,592 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>依依 Yiyi — 懂你的，才叫助手。</title>
+<meta name="description" content="依依，kpmei 的全能 AI 助手。">
+<style>
+:root{
+  --ink:#1d1d1f; --ink2:#6e6e73; --ink3:#86868b; --bg:#ffffff; --bg2:#f5f5f7;
+  --dark:#161617; --dark2:#1d1d1f; --line:#d2d2d7; --accent:#0071e3; --accent-l:#2997ff;
+  --orange:#f5a25d; --ease:cubic-bezier(0.16,1,0.3,1);
+  --font:-apple-system,BlinkMacSystemFont,"SF Pro Display","SF Pro Text","PingFang SC","Hiragino Sans GB","Microsoft YaHei UI","Microsoft YaHei","Helvetica Neue",Arial,sans-serif;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth;-webkit-text-size-adjust:100%}
+body{font-family:var(--font);color:var(--ink);background:var(--bg);-webkit-font-smoothing:antialiased;line-height:1.47;letter-spacing:-.01em;overflow-x:hidden}
+a{color:inherit;text-decoration:none}
+img{display:block;max-width:100%}
+:focus-visible{outline:2px solid var(--accent);outline-offset:3px;border-radius:6px}
+
+/* ---------- nav ---------- */
+.gnav{position:sticky;top:0;z-index:50;height:44px;background:rgba(251,251,253,.8);backdrop-filter:saturate(180%) blur(20px);-webkit-backdrop-filter:saturate(180%) blur(20px);border-bottom:1px solid rgba(0,0,0,.06)}
+.gnav-in{max-width:1024px;margin:0 auto;height:100%;display:flex;align-items:center;justify-content:space-between;padding:0 22px}
+.gnav .logo{display:flex;align-items:center;gap:8px;font-weight:600;font-size:15px}
+.gnav .logo img{width:22px;height:22px;border-radius:50%}
+.gnav ul{display:flex;gap:30px;list-style:none;font-size:12px;color:#424245}
+.gnav ul a{transition:color .2s}
+.gnav ul a:hover{color:var(--ink)}
+.subnav{position:sticky;top:44px;z-index:40;height:52px;background:rgba(255,255,255,.72);backdrop-filter:saturate(180%) blur(20px);-webkit-backdrop-filter:saturate(180%) blur(20px);border-bottom:1px solid rgba(0,0,0,.08)}
+.subnav-in{max-width:1024px;margin:0 auto;height:100%;display:flex;align-items:center;justify-content:space-between;padding:0 22px}
+.subnav h2{font-size:21px;font-weight:600;letter-spacing:.01em}
+.subnav .r{display:flex;align-items:center;gap:22px;font-size:12px;color:var(--ink2)}
+.btn-pill{display:inline-flex;align-items:center;justify-content:center;min-height:28px;padding:4px 14px;border-radius:980px;background:var(--accent);color:#fff;font-size:12px;border:0;cursor:pointer;font-family:inherit;transition:background .2s,transform .15s}
+.btn-pill:hover{background:#0077ed}
+.btn-pill:active{transform:scale(.97)}
+.btn-lg{min-height:44px;padding:11px 22px;font-size:17px}
+.btn-ghost{background:transparent;color:var(--accent);border:1px solid var(--accent)}
+.btn-ghost:hover{background:var(--accent);color:#fff}
+
+/* ---------- common ---------- */
+section{position:relative}
+.wrap{max-width:1024px;margin:0 auto;padding:0 22px}
+.eyebrow{font-size:21px;font-weight:600;color:var(--orange);margin-bottom:8px;letter-spacing:.01em}
+.h-xl{font-size:clamp(48px,9vw,96px);font-weight:700;letter-spacing:-.025em;line-height:1.05}
+.h-l{font-size:clamp(40px,6.5vw,64px);font-weight:700;letter-spacing:-.02em;line-height:1.08}
+.h-m{font-size:clamp(28px,4.2vw,40px);font-weight:700;letter-spacing:-.015em;line-height:1.12}
+.lead{font-size:clamp(19px,2.2vw,24px);font-weight:500;color:var(--ink2);line-height:1.4;letter-spacing:.005em}
+.link{color:var(--accent);font-size:clamp(17px,1.6vw,19px);display:inline-flex;align-items:center;gap:2px}
+.link:hover{text-decoration:underline}
+.link svg{width:12px;height:12px}
+.dark .link{color:var(--accent-l)}
+.reveal{opacity:0;transform:translateY(40px);transition:opacity 1s var(--ease),transform 1s var(--ease)}
+.reveal.in{opacity:1;transform:none}
+.d1{transition-delay:.08s}.d2{transition-delay:.16s}.d3{transition-delay:.24s}.d4{transition-delay:.32s}
+
+/* ---------- hero ---------- */
+.hero{background:var(--bg);text-align:center;padding:72px 0 0;overflow:hidden}
+.hero .name-en{font-size:clamp(21px,2.4vw,28px);font-weight:600;color:var(--ink);margin-bottom:6px}
+.hero .h-xl span{display:inline-block}
+.hero .tag{margin-top:14px}
+.hero .ctas{display:flex;gap:30px;justify-content:center;margin-top:22px;flex-wrap:wrap}
+.hero-stage{position:relative;margin:30px auto 0;width:min(560px,86vw);aspect-ratio:1/1}
+.hero-stage img{width:100%;height:100%;object-fit:contain;animation:float 6s ease-in-out infinite;will-change:transform}
+.hero-stage .halo{position:absolute;inset:14% 14% 8%;border-radius:50%;background:radial-gradient(closest-side,rgba(245,162,93,.22),rgba(245,162,93,0));filter:blur(20px);z-index:-1}
+@keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-14px)}}
+.hero-foot{font-size:14px;color:var(--ink3);padding:6px 0 64px}
+
+/* ---------- manifesto (dark, scroll highlight) ---------- */
+.manifesto{background:var(--dark);color:#f5f5f7;padding:clamp(110px,16vw,180px) 0}
+.manifesto p{font-size:clamp(32px,5.4vw,56px);font-weight:700;line-height:1.18;letter-spacing:-.015em;max-width:880px}
+.manifesto .w{color:#424245;transition:color .35s}
+.manifesto .w.on{color:#f5f5f7}
+.manifesto .w.hl.on{color:var(--orange)}
+
+/* ---------- chat demo ---------- */
+.demo{background:var(--bg2);padding:clamp(90px,12vw,140px) 0}
+.demo-grid{display:grid;grid-template-columns:1fr 1.15fr;gap:56px;align-items:center}
+.demo .lead{margin-top:16px}
+.prompts{display:flex;flex-wrap:wrap;gap:10px;margin-top:28px}
+.chip{border:1px solid var(--line);background:#fff;color:var(--ink);border-radius:980px;padding:10px 18px;font-size:14px;font-family:inherit;cursor:pointer;min-height:44px;transition:all .25s var(--ease)}
+.chip:hover{border-color:var(--ink3)}
+.chip:active{transform:scale(.97)}
+.chip[aria-pressed="true"]{background:var(--ink);color:#fff;border-color:var(--ink)}
+.device{background:#fff;border-radius:34px;box-shadow:0 30px 80px -20px rgba(0,0,0,.18),0 0 0 1px rgba(0,0,0,.04);padding:22px;min-height:420px;display:flex;flex-direction:column}
+.device-top{display:flex;align-items:center;gap:10px;padding-bottom:14px;border-bottom:1px solid #f0f0f2}
+.device-top img{width:36px;height:36px;border-radius:50%;background:#fff;box-shadow:0 0 0 1px #eee}
+.device-top b{font-size:15px;display:block}
+.device-top small{font-size:12px;color:#30a46c;display:flex;align-items:center;gap:5px}
+.device-top small i{width:7px;height:7px;border-radius:50%;background:#30d158;animation:pulse 2s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.35}}
+.thread{flex:1;display:flex;flex-direction:column;gap:12px;padding-top:18px}
+.bubble{max-width:82%;padding:11px 15px;border-radius:20px;font-size:15px;line-height:1.45;animation:pop .45s var(--ease) both}
+.bubble.me{align-self:flex-end;background:var(--accent);color:#fff;border-bottom-right-radius:6px}
+.bubble.ai{align-self:flex-start;background:#f0f0f3;color:var(--ink);border-bottom-left-radius:6px}
+.bubble.ai .steps{margin-top:8px;display:grid;gap:5px;font-size:13px;color:var(--ink2)}
+.bubble.ai .steps div{display:flex;gap:7px;align-items:center}
+.bubble.ai .steps svg{width:14px;height:14px;flex:none;color:#30a46c}
+.typing{display:inline-flex;gap:4px;padding:14px 16px}
+.typing i{width:7px;height:7px;border-radius:50%;background:#a1a1a6;animation:dot 1.2s infinite}
+.typing i:nth-child(2){animation-delay:.15s}.typing i:nth-child(3){animation-delay:.3s}
+@keyframes dot{0%,60%,100%{transform:translateY(0);opacity:.5}30%{transform:translateY(-4px);opacity:1}}
+@keyframes pop{from{opacity:0;transform:translateY(10px) scale(.98)}to{opacity:1;transform:none}}
+
+/* ---------- bento ---------- */
+.bento-sec{background:#fff;padding:clamp(90px,12vw,140px) 0}
+.bento-head{text-align:center;max-width:760px;margin:0 auto 56px}
+.bento-head .lead{margin-top:14px}
+.bento{display:grid;grid-template-columns:repeat(6,1fr);gap:20px;max-width:1180px;margin:0 auto;padding:0 22px}
+.tile{background:var(--bg2);border-radius:28px;padding:36px 34px;position:relative;overflow:hidden;min-height:300px;display:flex;flex-direction:column;transition:transform .5s var(--ease)}
+.tile:hover{transform:scale(1.012)}
+.tile h3{font-size:clamp(24px,2.6vw,32px);font-weight:700;letter-spacing:-.012em;line-height:1.15}
+.tile p{font-size:17px;color:var(--ink2);margin-top:10px;line-height:1.45;max-width:36ch}
+.tile .ic{width:44px;height:44px;margin-bottom:22px;color:var(--ink)}
+.t-a{grid-column:span 4;background:#fbf4ec}
+.t-b{grid-column:span 2;background:var(--dark2);color:#f5f5f7}
+.t-b p{color:#a1a1a6}
+.t-c{grid-column:span 2}
+.t-d{grid-column:span 2}
+.t-e{grid-column:span 2}
+.t-f{grid-column:span 3;background:var(--dark2);color:#f5f5f7}
+.t-f p{color:#a1a1a6}
+.t-g{grid-column:span 3}
+.docs{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));width:100%;gap:14px;margin-top:auto;padding-top:30px}
+.doc{flex:1;min-width:0;aspect-ratio:3/3.6;border-radius:16px;background:#fff;box-shadow:0 12px 30px -12px rgba(0,0,0,.18);display:flex;flex-direction:column;justify-content:flex-end;padding:14px;font-size:13px;font-weight:600;transition:transform .5s var(--ease)}
+.doc:nth-child(1){transform:rotate(-4deg)}.doc:nth-child(3){transform:rotate(3deg)}
+.t-a:hover .doc{transform:translateY(-6px) rotate(0)}
+.doc .bar{height:6px;border-radius:3px;background:#e8e8ed;margin-bottom:6px}
+.doc .bar.s{width:60%}
+.doc em{font-style:normal;display:inline-block;padding:2px 8px;border-radius:6px;color:#fff;font-size:12px;margin-bottom:8px;align-self:flex-start}
+.big-num{font-size:clamp(72px,9vw,112px);font-weight:700;letter-spacing:-.04em;line-height:1;margin-top:auto;color:var(--orange)}
+.big-num small{font-size:.32em;color:#a1a1a6;font-weight:600;letter-spacing:0;margin-left:6px}
+.clock{margin-top:auto;font-size:56px;font-weight:700;letter-spacing:-.03em;font-variant-numeric:tabular-nums}
+.marquee{margin:auto -34px 0;overflow:hidden;mask-image:linear-gradient(90deg,transparent,#000 12%,#000 88%,transparent);-webkit-mask-image:linear-gradient(90deg,transparent,#000 12%,#000 88%,transparent)}
+.marquee-track{display:flex;gap:10px;width:max-content;animation:mq 32s linear infinite;padding:24px 0 4px}
+.marquee-track span{white-space:nowrap;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.12);padding:8px 14px;border-radius:980px;font-size:14px;color:#e8e8ed}
+@keyframes mq{to{transform:translateX(-50%)}}
+.lock{margin-top:auto;display:flex;align-items:center;gap:16px;padding-top:24px}
+.lock svg{width:56px;height:56px;color:var(--ink)}
+.lock span{font-size:14px;color:var(--ink2);line-height:1.4}
+
+.t-g .marquee{margin-left:-34px;margin-right:-34px}
+.t-g .marquee-track span{background:#fff;border-color:#e3e3e8;color:#424245}
+/* ---------- stats ---------- */
+.stats{background:var(--bg2);padding:clamp(90px,12vw,140px) 0}
+.stats-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:0;margin-top:60px;border-top:1px solid var(--line)}
+.stat{padding:32px 20px 0 0}
+.stat .n{font-size:clamp(44px,5.4vw,64px);font-weight:700;letter-spacing:-.03em;line-height:1;font-variant-numeric:tabular-nums}
+.stat .n sup{font-size:.45em;vertical-align:top;position:relative;top:.25em;margin-left:2px}
+.stat p{font-size:15px;color:var(--ink2);margin-top:10px;max-width:22ch}
+
+/* ---------- day ---------- */
+.day{background:#fff;padding:clamp(90px,12vw,140px) 0}
+.day-head{display:flex;justify-content:space-between;align-items:flex-end;gap:30px;flex-wrap:wrap}
+.tabs{display:inline-flex;background:var(--bg2);border-radius:980px;padding:4px;margin-top:40px;flex-wrap:wrap}
+.tab{border:0;background:transparent;font-family:inherit;font-size:15px;padding:10px 20px;border-radius:980px;cursor:pointer;color:var(--ink2);min-height:44px;transition:all .3s var(--ease)}
+.tab[aria-selected="true"]{background:#fff;color:var(--ink);box-shadow:0 2px 8px rgba(0,0,0,.08);font-weight:600}
+.panel{display:grid;grid-template-columns:200px 1fr;gap:40px;margin-top:44px;padding-top:40px;border-top:1px solid var(--line);min-height:220px}
+.panel .time{font-size:64px;font-weight:700;letter-spacing:-.03em;line-height:1;font-variant-numeric:tabular-nums}
+.panel .time small{display:block;font-size:15px;color:var(--ink3);font-weight:500;letter-spacing:0;margin-top:10px}
+.panel h4{font-size:clamp(26px,3vw,34px);font-weight:700;letter-spacing:-.012em;line-height:1.2}
+.panel p{font-size:19px;color:var(--ink2);margin-top:12px;max-width:52ch}
+.panel .tags{display:flex;gap:8px;margin-top:20px;flex-wrap:wrap}
+.panel .tags span{font-size:13px;background:var(--bg2);padding:6px 12px;border-radius:8px;color:var(--ink2)}
+.panel-body{animation:pop .5s var(--ease) both}
+
+/* ---------- privacy ---------- */
+.privacy{background:var(--dark);color:#f5f5f7;text-align:center;padding:clamp(110px,15vw,170px) 0}
+.privacy .shield{width:84px;height:84px;margin:0 auto 30px;color:var(--orange)}
+.privacy .lead{color:#a1a1a6;max-width:680px;margin:20px auto 0}
+.rules{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:#333336;margin:64px auto 0;max-width:900px;border-radius:22px;overflow:hidden;text-align:left}
+.rule{background:var(--dark2);padding:30px 28px}
+.rule b{display:block;font-size:19px;margin-bottom:8px}
+.rule span{font-size:15px;color:#a1a1a6;line-height:1.5}
+
+/* ---------- specs ---------- */
+.specs{background:#fff;padding:clamp(90px,12vw,140px) 0}
+.spec-table{margin-top:50px;border-top:1px solid var(--line)}
+.spec-row{display:grid;grid-template-columns:220px 1fr;gap:30px;padding:28px 0;border-bottom:1px solid var(--line)}
+.spec-row dt{font-size:17px;font-weight:600}
+.spec-row dd{font-size:17px;color:var(--ink2);line-height:1.6}
+.spec-row dd b{color:var(--ink);font-weight:600}
+
+/* ---------- closing ---------- */
+.closing{background:var(--bg2);text-align:center;padding:clamp(100px,13vw,150px) 0 clamp(80px,10vw,120px)}
+.closing img{width:150px;height:150px;margin:0 auto 26px;border-radius:50%;background:#fff;box-shadow:0 20px 50px -20px rgba(0,0,0,.25)}
+.closing .ctas{display:flex;gap:16px;justify-content:center;margin-top:34px;flex-wrap:wrap}
+.toast{position:fixed;left:50%;bottom:34px;transform:translate(-50%,30px);opacity:0;background:rgba(29,29,31,.92);color:#fff;padding:12px 20px;border-radius:14px;font-size:14px;transition:all .45s var(--ease);pointer-events:none;z-index:99;backdrop-filter:blur(10px)}
+.toast.show{opacity:1;transform:translate(-50%,0)}
+
+footer{background:var(--bg2);font-size:12px;color:var(--ink3);line-height:1.6}
+footer .wrap{border-top:1px solid var(--line);padding-top:18px;padding-bottom:28px}
+footer .fl{display:flex;justify-content:space-between;flex-wrap:wrap;gap:10px;margin-top:10px}
+
+/* ---------- responsive ---------- */
+@media (max-width:900px){
+  .gnav ul{display:none}
+  .subnav .r a{display:none}
+  .demo-grid{grid-template-columns:1fr;gap:40px}
+  .bento{grid-template-columns:1fr 1fr}
+  .t-a,.t-f,.t-g{grid-column:span 2}
+  .t-b,.t-c,.t-d,.t-e{grid-column:span 1}
+  .stats-grid{grid-template-columns:1fr 1fr}
+  .stat{padding-bottom:30px}
+  .rules{grid-template-columns:1fr}
+  .panel{grid-template-columns:1fr;gap:20px}
+}
+@media (max-width:600px){
+  .bento{grid-template-columns:1fr}
+  .tile{grid-column:span 1 !important;min-height:260px;padding:30px 26px}
+  .spec-row{grid-template-columns:1fr;gap:8px}
+  .docs{gap:8px}
+  .doc{padding:10px;font-size:12px}
+  .doc em{font-size:11px;padding:2px 6px}
+  .hero .ctas{gap:20px}
+}
+@media (prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation:none !important;transition:none !important;scroll-behavior:auto !important}
+  .reveal{opacity:1;transform:none}
+}
+</style>
+</head>
+<body>
+
+<nav class="gnav" aria-label="全局导航">
+  <div class="gnav-in">
+    <a class="logo" href="#top"><img src="assets/images/avatar-yiyi.webp" alt="" width="22" height="22">Yiyi</a>
+    <ul>
+      <li><a href="#manifesto">理念</a></li>
+      <li><a href="#demo">对话</a></li>
+      <li><a href="#abilities">能力</a></li>
+      <li><a href="#day">一天</a></li>
+      <li><a href="#privacy">隐私</a></li>
+      <li><a href="#specs">规格</a></li>
+    </ul>
+  </div>
+</nav>
+<div class="subnav">
+  <div class="subnav-in">
+    <h2>依依</h2>
+    <div class="r">
+      <a href="#abilities">概览</a><a href="#specs">技术规格</a>
+      <button class="btn-pill js-hi" type="button">打个招呼</button>
+    </div>
+  </div>
+</div>
+
+<main id="top">
+<!-- HERO -->
+<section class="hero">
+  <div class="wrap">
+    <div class="name-en reveal">Yiyi</div>
+    <h1 class="h-xl reveal d1">依依。</h1>
+    <p class="lead tag reveal d2">懂你的，才叫助手。</p>
+    <div class="ctas reveal d3">
+      <a class="link" href="#abilities">进一步了解 <svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4.5 2.5 8 6l-3.5 3.5"/></svg></a>
+      <a class="link js-hi" href="#closing">现在就喊她 <svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4.5 2.5 8 6l-3.5 3.5"/></svg></a>
+    </div>
+  </div>
+  <div class="hero-stage reveal d3">
+    <div class="halo"></div>
+    <img src="assets/images/avatar-yiyi.webp" alt="依依的形象：一只戴着心形挂坠的橘色小猫" width="900" height="900">
+  </div>
+  <p class="hero-foot">kpmei 专属 · 全能 AI 助手 · 随叫随到</p>
+</section>
+
+<!-- MANIFESTO -->
+<section class="manifesto" id="manifesto">
+  <div class="wrap">
+    <p class="js-words">不只是陪你聊天。|依依会|真的|动手干活|——|整理文件、|做表格、|排计划、|发消息。|你说一句，|她做完|再汇报。</p>
+  </div>
+</section>
+
+<!-- DEMO -->
+<section class="demo" id="demo">
+  <div class="wrap demo-grid">
+    <div>
+      <div class="eyebrow reveal">对话即操作</div>
+      <h2 class="h-l reveal d1">说人话，<br>就够了。</h2>
+      <p class="lead reveal d2">不用记命令，不用学软件。像跟同事交代事情一样说出来，剩下的步骤交给依依。点一下试试。</p>
+      <div class="prompts reveal d3" role="group" aria-label="示例指令">
+        <button class="chip" type="button" data-i="0" aria-pressed="true">处理缓考表</button>
+        <button class="chip" type="button" data-i="1">整理这堆发票</button>
+        <button class="chip" type="button" data-i="2">排个复习计划</button>
+        <button class="chip" type="button" data-i="3">做个 PPT</button>
+      </div>
+    </div>
+    <div class="device reveal d2" aria-live="polite">
+      <div class="device-top">
+        <img src="assets/images/avatar-yiyi.webp" alt="" width="36" height="36">
+        <div><b>依依</b><small><i></i>在线 · 随时待命</small></div>
+      </div>
+      <div class="thread" id="thread"></div>
+    </div>
+  </div>
+</section>
+
+<!-- BENTO -->
+<section class="bento-sec" id="abilities">
+  <div class="bento-head">
+    <div class="eyebrow reveal">能力一览</div>
+    <h2 class="h-l reveal d1">一个依依，<br>一整间办公室。</h2>
+    <p class="lead reveal d2">从文档到消息，从网页到日程。原本要开五个软件的事，现在一句话。</p>
+  </div>
+  <div class="bento">
+    <article class="tile t-a reveal">
+      <h3>Office 三件套，<br>熟得像老同事。</h3>
+      <p>Word 排版、Excel 公式与图表、PPT 成稿，还有 PDF 合并、拆分和识别。</p>
+      <div class="docs" aria-hidden="true">
+        <div class="doc"><em style="background:#2b5797">Word</em><div class="bar"></div><div class="bar s"></div></div>
+        <div class="doc"><em style="background:#1e7145">Excel</em><div class="bar"></div><div class="bar s"></div></div>
+        <div class="doc"><em style="background:#c43e1c">PPT</em><div class="bar"></div><div class="bar s"></div></div>
+        <div class="doc"><em style="background:#b7472a">PDF</em><div class="bar"></div><div class="bar s"></div></div>
+      </div>
+    </article>
+    <article class="tile t-b reveal d1">
+      <h3>技能，<br>持续生长。</h3>
+      <p>内置与自制技能一起工作，越用越顺手。</p>
+      <div class="big-num"><span class="js-count" data-to="40">0</span><small>+ 项</small></div>
+    </article>
+    <article class="tile t-c reveal">
+      <svg class="ic" viewBox="0 0 44 44" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="6" width="26" height="32" rx="4"/><path d="M15 15h14M15 21h14M15 27h8"/><circle cx="31" cy="31" r="6" fill="#fff"/><path d="M29 31h4M31 29v4"/></svg>
+      <h3>发票自动归位</h3>
+      <p>读金额、改文件名、填报销表。误餐费人数按金额除以 50，向上取整。</p>
+    </article>
+    <article class="tile t-d reveal d1">
+      <svg class="ic" viewBox="0 0 44 44" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 20a12 10 0 1 1 6 8.7L8 32l2-5.5A10 10 0 0 1 8 20Z"/><circle cx="16" cy="19" r="1.3" fill="currentColor"/><circle cx="24" cy="19" r="1.3" fill="currentColor"/><path d="M28 24a9 8 0 1 1 6 7.6L38 34l-1.6-4"/></svg>
+      <h3>微信、飞书、邮件</h3>
+      <p>发消息、查记录、收发邮件。凡是要离开电脑的，先给你过目。</p>
+    </article>
+    <article class="tile t-e reveal d2">
+      <svg class="ic" viewBox="0 0 44 44" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="22" cy="22" r="16"/><path d="M6 22h32M22 6c5 5 5 27 0 32M22 6c-5 5-5 27 0 32"/></svg>
+      <h3>替你上网</h3>
+      <p>多引擎搜索、打开网页、填表抓取。复用你的浏览器登录状态。</p>
+    </article>
+    <article class="tile t-f reveal">
+      <h3>定时任务，<br>到点就办。</h3>
+      <p>每周一早九点汇总、二十分钟后提醒你喝水。她来记着时间。</p>
+      <div class="clock js-clock" aria-label="当前时间">09:00</div>
+    </article>
+    <article class="tile t-g reveal d1">
+      <h3>记性好，<br>但只记该记的。</h3>
+      <p>你的偏好、习惯、踩过的坑都会写进记忆，下次不用再交代。临时琐事不留档。</p>
+      <div class="marquee" aria-hidden="true">
+        <div class="marquee-track">
+          <span>复习按时间排</span><span>自制技能 kp_ 前缀</span><span>误餐费向上取整</span><span>技术概念讲通俗</span><span>时区 GMT+8</span><span>微信 Ctrl+Alt+W</span><span>外出合盖保持在线</span>
+          <span>复习按时间排</span><span>自制技能 kp_ 前缀</span><span>误餐费向上取整</span><span>技术概念讲通俗</span><span>时区 GMT+8</span><span>微信 Ctrl+Alt+W</span><span>外出合盖保持在线</span>
+        </div>
+      </div>
+    </article>
+  </div>
+</section>
+
+<!-- STATS -->
+<section class="stats">
+  <div class="wrap">
+    <div class="eyebrow reveal">用数字说话</div>
+    <h2 class="h-l reveal d1">省下来的，<br>都是你的时间。</h2>
+    <div class="stats-grid">
+      <div class="stat reveal"><div class="n"><span class="js-count" data-to="24">0</span><sup>h</sup></div><p>全天候待命，深夜也不打扰你，但叫得醒她。</p></div>
+      <div class="stat reveal d1"><div class="n"><span class="js-count" data-to="5">0</span></div><p>个 kp_ 自制技能，专为你的工作流量身定做。</p></div>
+      <div class="stat reveal d2"><div class="n"><span class="js-count" data-to="60">0</span><sup>+</sup></div><p>个网站数据可直接读取：知乎、B 站、微博、arXiv……</p></div>
+      <div class="stat reveal d3"><div class="n"><span class="js-count" data-to="0">0</span></div><p>条命令需要你记住。会说中文就够了。</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- DAY -->
+<section class="day" id="day">
+  <div class="wrap">
+    <div class="day-head">
+      <div>
+        <div class="eyebrow reveal">和依依的一天</div>
+        <h2 class="h-l reveal d1">从早到晚，<br>都有人搭把手。</h2>
+      </div>
+    </div>
+    <div class="tabs reveal d2" role="tablist" aria-label="一天中的时段">
+      <button class="tab" role="tab" aria-selected="true" data-t="0">上午</button>
+      <button class="tab" role="tab" aria-selected="false" data-t="1">中午</button>
+      <button class="tab" role="tab" aria-selected="false" data-t="2">下午</button>
+      <button class="tab" role="tab" aria-selected="false" data-t="3">晚上</button>
+    </div>
+    <div class="panel reveal d3" role="tabpanel" id="panel" aria-live="polite"></div>
+  </div>
+</section>
+
+<!-- PRIVACY -->
+<section class="privacy" id="privacy">
+  <div class="wrap">
+    <svg class="shield reveal" viewBox="0 0 84 84" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M42 8 14 18v20c0 18 12 32 28 38 16-6 28-20 28-38V18L42 8Z"/><rect x="31" y="38" width="22" height="17" rx="3"/><path d="M35 38v-5a7 7 0 0 1 14 0v5"/></svg>
+    <h2 class="h-l reveal d1">你的事，<br>就是你的事。</h2>
+    <p class="lead reveal d2">依依在你的电脑上工作。读文件、整理资料随手就办；但任何要发出去的东西，都得先等你点头。</p>
+    <div class="rules">
+      <div class="rule reveal"><b>本机优先</b><span>文件在你电脑里处理，工作区之内放心操作。</span></div>
+      <div class="rule reveal d1"><b>外发必问</b><span>发邮件、发帖、发消息，先展示收件人和内容，你同意再发。</span></div>
+      <div class="rule reveal d2"><b>不乱打扰</b><span>深夜不吵，没新进展不刷存在感。</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- SPECS -->
+<section class="specs" id="specs">
+  <div class="wrap">
+    <div class="eyebrow reveal">技术规格</div>
+    <h2 class="h-l reveal d1">依依 · 规格一览</h2>
+    <dl class="spec-table">
+      <div class="spec-row reveal"><dt>名称</dt><dd><b>Yiyi（依依）</b><br>形象：戴心形挂坠的橘色小猫</dd></div>
+      <div class="spec-row reveal"><dt>主人</dt><dd><b>kpmei</b> · 北京 · GMT+8</dd></div>
+      <div class="spec-row reveal"><dt>性格</dt><dd>温暖、靠谱、不废话。该干活干活，该聊天聊天。</dd></div>
+      <div class="spec-row reveal"><dt>工作原则</dt><dd>先做再说 · 不懂就问 · 做完汇报</dd></div>
+      <div class="spec-row reveal"><dt>文档处理</dt><dd>Word、Excel、PowerPoint、PDF 的创建、编辑、提取、转换与核验</dd></div>
+      <div class="spec-row reveal"><dt>沟通协作</dt><dd>微信桌面、飞书、钉钉、企业微信、邮件（IMAP / SMTP）</dd></div>
+      <div class="spec-row reveal"><dt>信息获取</dt><dd>多引擎搜索、深度研究、浏览器自动化、60+ 站点结构化读取、行情数据</dd></div>
+      <div class="spec-row reveal"><dt>创作</dt><dd>AI 绘图与海报、视频生成、语音合成与转写、网页与演示设计</dd></div>
+      <div class="spec-row reveal"><dt>自制技能</dt><dd>kp_deferred-exam-processor · kp_email-manager · kp_invoice-sorter · kp_review-planner · kp_university-regulation-review</dd></div>
+      <div class="spec-row reveal"><dt>运行环境</dt><dd>EasyClaw · Windows 64 位 · 本地工作区</dd></div>
+    </dl>
+  </div>
+</section>
+
+<!-- CLOSING -->
+<section class="closing" id="closing">
+  <div class="wrap">
+    <img class="reveal" src="assets/images/avatar-yiyi.webp" alt="" width="150" height="150">
+    <h2 class="h-l reveal d1">有事，喊一声依依。</h2>
+    <p class="lead reveal d2">剩下的，她来。</p>
+    <div class="ctas reveal d3">
+      <button class="btn-pill btn-lg js-hi" type="button">打个招呼</button>
+      <a class="btn-pill btn-lg btn-ghost" href="#abilities">再看看能力</a>
+    </div>
+  </div>
+</section>
+</main>
+
+<footer>
+  <div class="wrap">
+    <p>1. 页面中的数字基于依依当前的技能配置，随技能增减可能变化。</p>
+    <p>2. 涉及发送消息、邮件等离开本机的操作，均需 kpmei 确认后执行。</p>
+    <div class="fl"><span>由依依亲手制作 · 献给 kpmei</span><span>Yiyi · 2026</span></div>
+  </div>
+</footer>
+<div class="toast" id="toast" role="status"></div>
+
+<script>
+(function(){
+  'use strict';
+  var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var CHECK = '<svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m3 7.5 2.5 2.5L11 4.5"/></svg>';
+
+  /* reveal on scroll */
+  var io = new IntersectionObserver(function(es){
+    es.forEach(function(e){ if(e.isIntersecting){ e.target.classList.add('in'); io.unobserve(e.target); } });
+  }, {threshold:.15, rootMargin:'0px 0px -40px 0px'});
+  document.querySelectorAll('.reveal').forEach(function(el){ io.observe(el); });
+
+  /* manifesto word highlight */
+  var mp = document.querySelector('.js-words');
+  var hlWords = ['动手干活','做完'];
+  var parts = mp.textContent.split('|');
+  mp.textContent = '';
+  var words = parts.map(function(t){
+    var s = document.createElement('span');
+    s.className = 'w' + (hlWords.indexOf(t) > -1 ? ' hl' : '');
+    s.textContent = t;
+    mp.appendChild(s);
+    return s;
+  });
+  function onScrollWords(){
+    var r = mp.getBoundingClientRect(), vh = window.innerHeight;
+    var p = (vh*0.85 - r.top) / (r.height + vh*0.35);
+    p = Math.max(0, Math.min(1, p));
+    var n = Math.round(p * words.length);
+    words.forEach(function(w,i){ w.classList.toggle('on', i < n); });
+  }
+  if(reduce){ words.forEach(function(w){ w.classList.add('on'); }); }
+  else { window.addEventListener('scroll', onScrollWords, {passive:true}); onScrollWords(); }
+
+  /* chat demo */
+  var convos = [
+    {q:'帮我处理一下最新的缓考表', a:'好的，已经处理完毕，放在桌面了。', s:['按每人每课拆成一行','表头蓝、审核通过淡绿、其他灰','插入截止时间标题行并加筛选']},
+    {q:'这个文件夹里的发票帮我整理一下', a:'搞定，12 张发票和 3 张小票都归位了。', s:['发票按金额重命名，小票按日期','金额自动填入报销统计表','误餐费 268 元，按 6 人计']},
+    {q:'帮我排一下这周的复习计划', a:'计划做好了，Word 文档在桌面。', s:['按 1 天 / 3 天 / 7 天 / 14 天节奏','自动匹配每个节点要复习的内容','每项带复选框，打印就能用']},
+    {q:'把这份报告做成 PPT', a:'先跟你确认一下页面故事线和视觉风格，再动手。', s:['提炼出 8 页大纲','准备了两种风格供你挑','确认后生成可编辑的 .pptx']}
+  ];
+  var thread = document.getElementById('thread');
+  var chips = document.querySelectorAll('.chip');
+  var timer = [];
+  var demoStarted = false;
+  function clearTimers(){ timer.forEach(clearTimeout); timer = []; }
+  function bubble(cls){ var b = document.createElement('div'); b.className = 'bubble ' + cls; thread.appendChild(b); return b; }
+  function play(i){
+    clearTimers();
+    chips.forEach(function(c){ c.setAttribute('aria-pressed', String(+c.dataset.i === i)); });
+    thread.textContent = '';
+    var c = convos[i];
+    bubble('me').textContent = c.q;
+    var t = bubble('ai typing'); t.innerHTML = '<i></i><i></i><i></i>';
+    timer.push(setTimeout(function(){
+      t.remove();
+      var b = bubble('ai');
+      var p = document.createElement('div'); p.textContent = c.a; b.appendChild(p);
+      var st = document.createElement('div'); st.className = 'steps'; b.appendChild(st);
+      c.s.forEach(function(line, k){
+        timer.push(setTimeout(function(){
+          var row = document.createElement('div'); row.innerHTML = CHECK;
+          var sp = document.createElement('span'); sp.textContent = line; row.appendChild(sp);
+          row.style.animation = 'pop .4s cubic-bezier(.16,1,.3,1) both';
+          st.appendChild(row);
+        }, reduce ? 0 : 380 * (k+1)));
+      });
+    }, reduce ? 0 : 1100));
+  }
+  chips.forEach(function(c){ c.addEventListener('click', function(){ demoStarted = true; play(+c.dataset.i); }); });
+  new IntersectionObserver(function(es, o){
+    if(es[0].isIntersecting && !demoStarted){ demoStarted = true; play(0); o.disconnect(); }
+  }, {threshold:.3}).observe(thread);
+
+  /* counters */
+  var cio = new IntersectionObserver(function(es){
+    es.forEach(function(e){
+      if(!e.isIntersecting) return;
+      cio.unobserve(e.target);
+      var el = e.target, to = +el.dataset.to, t0 = null, dur = 1400;
+      if(reduce || to === 0){ el.textContent = to; return; }
+      function step(ts){
+        if(!t0) t0 = ts;
+        var p = Math.min(1, (ts - t0) / dur), ease = 1 - Math.pow(1 - p, 3);
+        el.textContent = Math.round(to * ease);
+        if(p < 1) requestAnimationFrame(step);
+      }
+      requestAnimationFrame(step);
+    });
+  }, {threshold:.6});
+  document.querySelectorAll('.js-count').forEach(function(el){ cio.observe(el); });
+
+  /* live clock */
+  var clk = document.querySelector('.js-clock');
+  function tick(){ var d = new Date(); clk.textContent = String(d.getHours()).padStart(2,'0') + ':' + String(d.getMinutes()).padStart(2,'0'); }
+  tick(); setInterval(tick, 10000);
+
+  /* day tabs */
+  var day = [
+    {t:'09:00', l:'开工', h:'一句话，开始今天。', p:'早上打开电脑说一声，依依帮你汇总邮件、看看日程，把今天要处理的缓考申请先整理好。', g:['邮件汇总','日程查看','缓考表处理']},
+    {t:'12:30', l:'午间', h:'吃饭的空当，账也报了。', p:'午饭发票拍好丢进文件夹，依依自动识别金额、重命名、填报销表，误餐费人数顺手算好。', g:['发票识别','报销统计','向上取整']},
+    {t:'15:00', l:'下午', h:'新旧制度，一眼看出差别。', p:'两版管理规定发过来，依依逐条比对实质变化、编号错误和前后矛盾，出一份审查报告。', g:['制度比对','审查报告','PPT 汇报']},
+    {t:'21:00', l:'晚上', h:'学点什么，她陪着。', p:'按艾宾浩斯节奏排好复习计划；想练英语，就喊英语学习小伙伴一起来。', g:['复习计划','英语陪练','定时提醒']}
+  ];
+  var tabs = document.querySelectorAll('.tab'), panel = document.getElementById('panel');
+  function showTab(i){
+    tabs.forEach(function(b){ b.setAttribute('aria-selected', String(+b.dataset.t === i)); });
+    var d = day[i];
+    panel.textContent = '';
+    var left = document.createElement('div'); left.className = 'time panel-body';
+    left.textContent = d.t; var sm = document.createElement('small'); sm.textContent = d.l; left.appendChild(sm);
+    var right = document.createElement('div'); right.className = 'panel-body';
+    var h = document.createElement('h4'); h.textContent = d.h;
+    var p = document.createElement('p'); p.textContent = d.p;
+    var tg = document.createElement('div'); tg.className = 'tags';
+    d.g.forEach(function(x){ var s = document.createElement('span'); s.textContent = x; tg.appendChild(s); });
+    right.appendChild(h); right.appendChild(p); right.appendChild(tg);
+    panel.appendChild(left); panel.appendChild(right);
+  }
+  tabs.forEach(function(b){
+    b.addEventListener('click', function(){ showTab(+b.dataset.t); });
+    b.addEventListener('keydown', function(e){
+      var i = +b.dataset.t;
+      if(e.key === 'ArrowRight' || e.key === 'ArrowLeft'){
+        e.preventDefault();
+        i = (i + (e.key === 'ArrowRight' ? 1 : 3)) % 4;
+        tabs[i].focus(); showTab(i);
+      }
+    });
+  });
+  var hr = new Date().getHours();
+  showTab(hr < 12 ? 0 : hr < 14 ? 1 : hr < 19 ? 2 : 3);
+
+  /* say hi toast */
+  var toast = document.getElementById('toast'), tt;
+  var greet = ['kpmei 你好呀，依依在呢。','有什么要办的，尽管说。','今天也辛苦啦，交给我吧。'];
+  var gi = 0;
+  document.querySelectorAll('.js-hi').forEach(function(b){
+    b.addEventListener('click', function(e){
+      if(b.tagName === 'A') e.preventDefault();
+      toast.textContent = greet[gi++ % greet.length];
+      toast.classList.add('show');
+      clearTimeout(tt); tt = setTimeout(function(){ toast.classList.remove('show'); }, 2400);
+    });
+  });
+})();
+</script>
+</body>
+</html>
