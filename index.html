@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>我的导航站</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: -apple-system, "Microsoft YaHei", "PingFang SC", sans-serif;
+    background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+    min-height: 100vh; padding: 40px 20px; color: #fff;
+  }
+  .header { text-align: center; margin-bottom: 40px; }
+  .header h1 { font-size: 2.2em; margin-bottom: 10px; letter-spacing: 2px; }
+  .header p { opacity: .8; font-size: .95em; }
+  .search-box {
+    max-width: 560px; margin: 24px auto 0; display: flex;
+    background: rgba(255,255,255,.95); border-radius: 50px; overflow: hidden;
+    box-shadow: 0 10px 30px rgba(0,0,0,.2);
+  }
+  .search-box input {
+    flex: 1; border: none; outline: none; padding: 16px 24px;
+    font-size: 16px; color: #333; background: transparent;
+  }
+  .search-box button {
+    border: none; padding: 0 32px; background: #ff7a00; color: #fff;
+    font-size: 16px; cursor: pointer; transition: .2s;
+  }
+  .search-box button:hover { background: #e56b00; }
+  .section { max-width: 1000px; margin: 0 auto 36px; }
+  .section h2 {
+    font-size: 1.05em; margin-bottom: 16px; opacity: .9;
+    border-left: 4px solid #ff7a00; padding-left: 10px;
+  }
+  .grid {
+    display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+    gap: 14px;
+  }
+  .card {
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    gap: 8px; padding: 20px 10px; border-radius: 14px;
+    background: rgba(255,255,255,.12); backdrop-filter: blur(6px);
+    color: #fff; text-decoration: none; font-size: .9em;
+    border: 1px solid rgba(255,255,255,.18);
+    transition: transform .18s, background .18s;
+  }
+  .card:hover { transform: translateY(-4px); background: rgba(255,255,255,.24); }
+  .card .ico { font-size: 1.8em; }
+  .footer { text-align: center; opacity: .6; font-size: .8em; margin-top: 30px; }
+</style>
+</head>
+<body>
+  <div class="header">
+    <h1>🧭 我的导航站</h1>
+    <p>常用网站，一键直达</p>
+    <form class="search-box" onsubmit="event.preventDefault(); window.location.href='https://www.bing.com/search?q='+encodeURIComponent(this.q.value);">
+      <input name="q" type="text" placeholder="输入关键词搜索…" autocomplete="off">
+      <button type="submit">搜索</button>
+    </form>
+  </div>
+
+  <div class="section">
+    <h2>常用工具</h2>
+    <div class="grid">
+      <a class="card" href="https://www.baidu.com" target="_blank"><span class="ico">🔍</span>百度</a>
+      <a class="card" href="https://www.bing.com" target="_blank"><span class="ico">🅱️</span>Bing</a>
+      <a class="card" href="https://www.google.com" target="_blank"><span class="ico">🌐</span>Google</a>
+      <a class="card" href="https://mail.qq.com" target="_blank"><span class="ico">📧</span>QQ邮箱</a>
+      <a class="card" href="https://www.zhihu.com" target="_blank"><span class="ico">📚</span>知乎</a>
+      <a class="card" href="https://www.bilibili.com" target="_blank"><span class="ico">📺</span>哔哩哔哩</a>
+    </div>
+  </div>
+
+  <div class="section">
+    <h2>开发与学习</h2>
+    <div class="grid">
+      <a class="card" href="https://github.com" target="_blank"><span class="ico">🐙</span>GitHub</a>
+      <a class="card" href="https://stackoverflow.com" target="_blank"><span class="ico">💡</span>Stack Overflow</a>
+      <a class="card" href="https://developer.mozilla.org" target="_blank"><span class="ico">📖</span>MDN 文档</a>
+      <a class="card" href="https://www.runoob.com" target="_blank"><span class="ico">🐣</span>菜鸟教程</a>
+      <a class="card" href="https://chat.openai.com" target="_blank"><span class="ico">🤖</span>ChatGPT</a>
+      <a class="card" href="https://www.deepseek.com" target="_blank"><span class="ico">🐋</span>DeepSeek</a>
+    </div>
+  </div>
+
+  <div class="section">
+    <h2>购物与生活</h2>
+    <div class="grid">
+      <a class="card" href="https://www.taobao.com" target="_blank"><span class="ico">🛒</span>淘宝</a>
+      <a class="card" href="https://www.jd.com" target="_blank"><span class="ico">📦</span>京东</a>
+      <a class="card" href="https://www.dianping.com" target="_blank"><span class="ico">🍜</span>大众点评</a>
+      <a class="card" href="https://www.12306.cn" target="_blank"><span class="ico">🚄</span>12306</a>
+      <a class="card" href="https://www.amap.com" target="_blank"><span class="ico">🗺️</span>高德地图</a>
+      <a class="card" href="https://www.douyin.com" target="_blank"><span class="ico">🎵</span>抖音</a>
+    </div>
+  </div>
+
+  <div class="footer">© 2026 我的导航站 · Powered by GitHub Pages</div>
+</body>
+</html>
