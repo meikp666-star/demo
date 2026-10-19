@@ -1,0 +1,408 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>依依 Yiyi - 懂你的事，替你办事</title>
+<style>
+:root{
+  --ink:#1d1d1f; --ink2:#6e6e73; --bg:#ffffff; --bg2:#f5f5f7; --dark:#161617; --dark2:#1d1d1f;
+  --accent:#e8833a; --accent-soft:#fbe6d4; --link:#0066cc; --line:#d2d2d7;
+  --ease:cubic-bezier(0.16,1,0.3,1);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display","SF Pro Text","PingFang SC","Helvetica Neue","Microsoft YaHei",sans-serif;
+  color:var(--ink);background:var(--bg);-webkit-font-smoothing:antialiased;letter-spacing:-0.01em;overflow-x:hidden}
+a{color:inherit;text-decoration:none}
+:focus-visible{outline:2px solid var(--link);outline-offset:3px;border-radius:6px}
+.wrap{max-width:1080px;margin:0 auto;padding:0 22px}
+
+/* nav */
+.nav{position:sticky;top:0;z-index:50;height:48px;background:rgba(251,251,253,.78);
+  backdrop-filter:saturate(180%) blur(20px);-webkit-backdrop-filter:saturate(180%) blur(20px);border-bottom:1px solid rgba(0,0,0,.08)}
+.nav .wrap{display:flex;align-items:center;justify-content:space-between;height:100%}
+.brand{font-weight:600;font-size:19px;display:flex;align-items:center;gap:8px}
+.brand img{width:26px;height:26px;border-radius:50%}
+.nav ul{display:flex;gap:32px;list-style:none;font-size:12px;color:#424245}
+.nav ul a{transition:color .2s}
+.nav ul a:hover,.nav ul a.on{color:var(--ink)}
+.pill{display:inline-flex;align-items:center;justify-content:center;min-height:30px;padding:4px 14px;border-radius:980px;background:var(--link);color:#fff;font-size:12px;border:0;cursor:pointer;transition:transform .2s,background .2s}
+.pill:hover{background:#0077ed}.pill:active{transform:scale(.97)}
+.pill.lg{font-size:17px;padding:12px 24px;min-height:48px}
+
+/* hero */
+.hero{text-align:center;padding:72px 0 0;background:var(--bg);overflow:hidden}
+.eyebrow{font-size:21px;font-weight:600;color:var(--accent);margin-bottom:6px}
+.hero h1{font-size:clamp(56px,11vw,120px);font-weight:700;letter-spacing:-0.04em;line-height:1.02}
+.hero .sub{font-size:clamp(22px,3.4vw,32px);font-weight:600;color:var(--ink);margin-top:10px;letter-spacing:-0.02em}
+.links{display:flex;gap:28px;justify-content:center;margin-top:22px;font-size:19px}
+.links a{color:var(--link)}.links a:hover{text-decoration:underline}
+.chev::after{content:"";display:inline-block;width:7px;height:7px;border-top:1.6px solid currentColor;border-right:1.6px solid currentColor;transform:rotate(45deg);margin-left:6px;margin-bottom:2px}
+.hero-stage{position:relative;margin:30px auto 0;width:min(560px,86vw);aspect-ratio:1/1}
+.hero-stage img{width:100%;height:100%;object-fit:contain;position:relative;z-index:2;will-change:transform;animation:float 6s ease-in-out infinite}
+.halo{position:absolute;inset:12%;border-radius:50%;background:radial-gradient(circle,var(--accent-soft) 0%,rgba(251,230,212,0) 70%);z-index:1;animation:breathe 6s ease-in-out infinite}
+@keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-14px)}}
+@keyframes breathe{0%,100%{transform:scale(1);opacity:.9}50%{transform:scale(1.08);opacity:1}}
+
+/* sections */
+section{padding:120px 0}
+.light2{background:var(--bg2)}
+.dark{background:var(--dark);color:#f5f5f7}
+.dark .muted{color:#86868b}
+.muted{color:var(--ink2)}
+.h2{font-size:clamp(40px,6.4vw,80px);font-weight:700;letter-spacing:-0.035em;line-height:1.05}
+.h3{font-size:clamp(28px,4vw,48px);font-weight:700;letter-spacing:-0.03em;line-height:1.1}
+.lead{font-size:clamp(19px,2.2vw,24px);line-height:1.45;font-weight:500;max-width:720px;margin-top:22px}
+.center{text-align:center}.center .lead{margin-left:auto;margin-right:auto}
+.grad-word{color:var(--accent)}
+
+/* reveal */
+.rv{opacity:0;transform:translateY(40px);transition:opacity 1s var(--ease),transform 1s var(--ease)}
+.rv.in{opacity:1;transform:none}
+.rv.d1{transition-delay:.1s}.rv.d2{transition-delay:.2s}.rv.d3{transition-delay:.3s}
+
+/* chat demo */
+.chat{margin:64px auto 0;max-width:640px;background:#232325;border-radius:28px;padding:28px;box-shadow:0 30px 80px rgba(0,0,0,.45);border:1px solid rgba(255,255,255,.06)}
+.bar{display:flex;gap:7px;margin-bottom:22px}.bar i{width:11px;height:11px;border-radius:50%;background:#48484a}
+.msg{max-width:84%;padding:12px 16px;border-radius:20px;font-size:17px;line-height:1.45;margin-bottom:12px}
+.msg.me{margin-left:auto;background:var(--link);color:#fff;border-bottom-right-radius:6px}
+.msg.yy{background:#3a3a3c;color:#f5f5f7;border-bottom-left-radius:6px;min-height:46px}
+.caret{display:inline-block;width:2px;height:1.05em;background:var(--accent);vertical-align:-3px;margin-left:2px;animation:blink 1s steps(1) infinite}
+@keyframes blink{50%{opacity:0}}
+.ctrl{display:flex;justify-content:center;margin-top:18px}
+.ghost{background:rgba(255,255,255,.08);color:#f5f5f7;border:0;border-radius:980px;padding:8px 16px;min-height:36px;font-size:13px;cursor:pointer}
+.ghost:hover{background:rgba(255,255,255,.14)}
+
+/* bento */
+.bento{display:grid;grid-template-columns:repeat(6,1fr);gap:20px;margin-top:64px}
+.tile{background:#fff;border-radius:28px;padding:36px 32px;position:relative;overflow:hidden;min-height:280px;display:flex;flex-direction:column;transition:transform .5s var(--ease),box-shadow .5s var(--ease)}
+.tile:hover{transform:translateY(-4px) scale(1.005);box-shadow:0 18px 50px rgba(0,0,0,.08)}
+.tile .k{font-size:14px;font-weight:600;color:var(--accent);margin-bottom:10px}
+.tile h3{font-size:28px;font-weight:700;letter-spacing:-0.025em;line-height:1.15}
+.tile p{font-size:17px;color:var(--ink2);line-height:1.5;margin-top:12px}
+.tile .ic{margin-top:auto;padding-top:24px}
+.tile svg{width:52px;height:52px;stroke:var(--ink);fill:none;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}
+.t-a{grid-column:span 4}.t-b{grid-column:span 2}.t-c{grid-column:span 2}.t-d{grid-column:span 2}.t-e{grid-column:span 2}.t-f{grid-column:span 3}.t-g{grid-column:span 3}
+.tile.ink{background:var(--dark2);color:#f5f5f7}.tile.ink p{color:#a1a1a6}.tile.ink svg{stroke:#f5f5f7}
+.tile.warm{background:linear-gradient(160deg,#fff6ee 0%,#fde3cc 100%)}
+.docs{display:flex;gap:10px;margin-top:auto;padding-top:28px;flex-wrap:wrap}
+.docs span{font-size:15px;font-weight:600;padding:10px 16px;border-radius:14px;background:var(--bg2)}
+.docs span:nth-child(1){color:#2b579a}.docs span:nth-child(2){color:#c43e1c}.docs span:nth-child(3){color:#217346}.docs span:nth-child(4){color:#b30b00}
+
+/* gallery */
+.gal-head{display:flex;justify-content:space-between;align-items:flex-end;gap:20px;flex-wrap:wrap}
+.gal{display:flex;gap:20px;overflow-x:auto;scroll-snap-type:x mandatory;padding:56px max(22px,calc((100vw - 1080px)/2 + 22px)) 20px;scrollbar-width:none}
+.gal::-webkit-scrollbar{display:none}
+.card{flex:0 0 min(340px,78vw);scroll-snap-align:start;background:#fff;border-radius:28px;padding:34px 30px;min-height:420px;display:flex;flex-direction:column;box-shadow:0 2px 12px rgba(0,0,0,.04)}
+.card .num{font-size:64px;font-weight:700;letter-spacing:-0.04em;color:var(--accent-soft);-webkit-text-stroke:1px var(--accent);line-height:1}
+.card .tag{font-size:12px;font-family:ui-monospace,Menlo,Consolas,monospace;color:var(--ink2);margin-top:28px}
+.card h4{font-size:26px;font-weight:700;letter-spacing:-0.02em;margin-top:6px}
+.card p{font-size:17px;line-height:1.5;color:var(--ink2);margin-top:12px}
+.card .foot{margin-top:auto;font-size:14px;color:var(--ink);font-weight:600;padding-top:20px;border-top:1px solid #e8e8ed}
+.arrows{display:flex;gap:12px}
+.arr{width:44px;height:44px;border-radius:50%;border:0;background:#e8e8ed;cursor:pointer;display:grid;place-items:center;transition:background .2s}
+.arr:hover{background:#dcdce0}.arr:disabled{opacity:.35;cursor:default}
+.arr svg{width:18px;height:18px;stroke:var(--ink);stroke-width:2;fill:none}
+
+/* stats */
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:20px;margin-top:72px;text-align:center}
+.stat b{display:block;font-size:clamp(56px,8vw,96px);font-weight:700;letter-spacing:-0.045em;line-height:1}
+.stat span{display:block;font-size:17px;color:var(--ink2);margin-top:12px;line-height:1.45}
+
+/* privacy */
+.shield{width:96px;height:96px;margin:0 auto 28px;display:block;stroke:var(--accent);fill:none;stroke-width:1.4}
+.shield path.chk{stroke-dasharray:40;stroke-dashoffset:40;transition:stroke-dashoffset 1.2s .4s var(--ease)}
+.in .shield path.chk{stroke-dashoffset:0}
+.three{display:grid;grid-template-columns:repeat(3,1fr);gap:48px;margin-top:80px;text-align:left}
+.three h4{font-size:21px;font-weight:600;margin-bottom:10px}
+.three p{font-size:17px;line-height:1.55;color:#a1a1a6}
+.three .line{height:1px;background:#424245;margin-bottom:24px}
+
+/* specs */
+.specs{margin-top:56px;border-top:1px solid var(--line)}
+.row{display:grid;grid-template-columns:240px 1fr;gap:24px;padding:28px 0;border-bottom:1px solid var(--line)}
+.row dt{font-size:21px;font-weight:600}
+.row dd{font-size:17px;line-height:1.6;color:var(--ink)}
+.row dd small{display:block;color:var(--ink2);font-size:14px;margin-top:4px}
+
+/* closing */
+.close{text-align:center;padding:140px 0}
+.close img{width:120px;height:120px;border-radius:50%;background:#fff;box-shadow:0 10px 40px rgba(232,131,58,.25)}
+.close .h2{margin-top:28px}
+footer{background:var(--bg2);color:var(--ink2);font-size:12px;padding:22px 0;border-top:1px solid var(--line)}
+footer .wrap{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap}
+#toast{position:fixed;left:50%;bottom:32px;transform:translate(-50%,20px);opacity:0;background:rgba(29,29,31,.92);color:#fff;font-size:15px;padding:12px 20px;border-radius:14px;transition:all .4s var(--ease);pointer-events:none;z-index:99}
+#toast.show{opacity:1;transform:translate(-50%,0)}
+
+@media (max-width:860px){
+  .nav ul{display:none}
+  .bento{grid-template-columns:1fr}.bento .tile{grid-column:auto!important}
+  .stats,.three{grid-template-columns:1fr;gap:40px}
+  .row{grid-template-columns:1fr;gap:8px}
+  section{padding:88px 0}
+}
+@media (prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation:none!important;transition:none!important}
+  .rv{opacity:1;transform:none}
+}
+</style>
+</head>
+<body>
+
+<nav class="nav" aria-label="主导航">
+  <div class="wrap">
+    <a class="brand" href="#top"><img src="assets/images/avatar-yiyi.webp" alt="" width="26" height="26">依依</a>
+    <ul>
+      <li><a href="#chat">对话</a></li>
+      <li><a href="#abilities">能力</a></li>
+      <li><a href="#skills">专属技能</a></li>
+      <li><a href="#privacy">隐私</a></li>
+      <li><a href="#specs">规格</a></li>
+    </ul>
+    <button class="pill" data-toast="依依已就位。直接说你要办的事就好。">召唤依依</button>
+  </div>
+</nav>
+
+<main id="top">
+<header class="hero">
+  <div class="wrap">
+    <p class="eyebrow rv">全新 AI 全能助手</p>
+    <h1 class="rv d1">依依</h1>
+    <p class="sub rv d2">懂你的事，替你办事。</p>
+    <div class="links rv d3">
+      <a href="#abilities" class="chev">进一步了解</a>
+      <a href="#chat" class="chev">看看她怎么干活</a>
+    </div>
+    <div class="hero-stage rv d3">
+      <div class="halo" aria-hidden="true"></div>
+      <img src="assets/images/avatar-yiyi.webp" alt="依依的形象：一只戴着粉色爱心挂坠的橘色小猫" width="900" height="900">
+    </div>
+  </div>
+</header>
+
+<section class="light2 center">
+  <div class="wrap">
+    <h2 class="h2 rv">不是聊天机器人。<br><span class="grad-word">是会动手的伙伴。</span></h2>
+    <p class="lead muted rv d1">依依住在你的电脑里。她能读文件、写文档、查资料、定提醒，还记得你的习惯。你只管说要什么，剩下的交给她。</p>
+  </div>
+</section>
+
+<section class="dark center" id="chat">
+  <div class="wrap">
+    <h2 class="h3 rv">一句话，事情就办了。</h2>
+    <p class="lead muted rv d1">不用学指令，不用找菜单。像跟同事交代工作一样自然。</p>
+    <div class="chat rv d2" role="region" aria-label="对话演示">
+      <div class="bar" aria-hidden="true"><i></i><i></i><i></i></div>
+      <div id="log" aria-live="polite"></div>
+    </div>
+    <div class="ctrl"><button class="ghost" id="replay">换一个场景</button></div>
+  </div>
+</section>
+
+<section class="light2" id="abilities">
+  <div class="wrap">
+    <h2 class="h2 center rv">一个依依，<br>顶一整个工具箱。</h2>
+    <div class="bento">
+      <article class="tile warm t-a rv">
+        <p class="k">办公文档</p>
+        <h3>Word、PPT、Excel、PDF，<br>样样拿得起。</h3>
+        <p>写报告、做幻灯片、整理表格、拆分合并 PDF、扫描件识字。格式规范，中文排版也讲究。</p>
+        <div class="docs"><span>Word</span><span>PowerPoint</span><span>Excel</span><span>PDF</span></div>
+      </article>
+      <article class="tile ink t-b rv d1">
+        <p class="k">记忆</p>
+        <h3>说过一次，<br>就记住了。</h3>
+        <p>你的偏好、约定、踩过的坑，都会写进长期记忆。下次不用再交代。</p>
+        <div class="ic"><svg viewBox="0 0 48 48" aria-hidden="true"><path d="M24 8c-7 0-12 5-12 11 0 4 2 6 2 9v4h20v-4c0-3 2-5 2-9 0-6-5-11-12-11z"/><path d="M18 38h12M20 42h8M24 16v8l5 3"/></svg></div>
+      </article>
+      <article class="tile t-c rv">
+        <p class="k">资料研究</p>
+        <h3>多引擎检索，<br>来源可查。</h3>
+        <p>新闻、政策、行业动态，并行搜索，交叉核实再给结论。</p>
+        <div class="ic"><svg viewBox="0 0 48 48" aria-hidden="true"><circle cx="21" cy="21" r="12"/><path d="M30 30l10 10"/></svg></div>
+      </article>
+      <article class="tile t-d rv d1">
+        <p class="k">定时提醒</p>
+        <h3>到点就办，<br>从不忘事。</h3>
+        <p>每周例会、截止日期、二十分钟后的提醒，一句话设好。</p>
+        <div class="ic"><svg viewBox="0 0 48 48" aria-hidden="true"><circle cx="24" cy="26" r="15"/><path d="M24 18v8l6 4M10 10l5-4M38 10l-5-4"/></svg></div>
+      </article>
+      <article class="tile t-e rv d2">
+        <p class="k">连接</p>
+        <h3>微信、飞书、<br>邮件、浏览器。</h3>
+        <p>发消息、读日程、查邮件、在网页里点点填填，替你跑腿。</p>
+        <div class="ic"><svg viewBox="0 0 48 48" aria-hidden="true"><circle cx="12" cy="24" r="5"/><circle cx="36" cy="12" r="5"/><circle cx="36" cy="36" r="5"/><path d="M16.5 21.5l15-7M16.5 26.5l15 7"/></svg></div>
+      </article>
+      <article class="tile t-f rv">
+        <p class="k">创作</p>
+        <h3>图、声、影，也能做。</h3>
+        <p>生成配图和海报，把文字变成语音，甚至做一段小视频。这一页的头像，就是依依自己的样子。</p>
+        <div class="ic"><svg viewBox="0 0 48 48" aria-hidden="true"><rect x="7" y="10" width="34" height="28" rx="5"/><circle cx="17" cy="20" r="3"/><path d="M7 32l10-8 8 6 6-4 10 8"/></svg></div>
+      </article>
+      <article class="tile ink t-g rv d1">
+        <p class="k">学习成长</p>
+        <h3>越用，越懂你。</h3>
+        <p>常做的事会被沉淀成专属技能，下一次一句话就跑完整个流程。</p>
+        <div class="ic"><svg viewBox="0 0 48 48" aria-hidden="true"><path d="M8 38l10-10 7 7 15-17"/><path d="M32 18h8v8"/></svg></div>
+      </article>
+    </div>
+  </div>
+</section>
+
+<section id="skills" style="padding-bottom:80px">
+  <div class="wrap gal-head">
+    <div>
+      <h2 class="h2 rv">为 kpmei 量身定制。</h2>
+      <p class="lead muted rv d1">这些技能只属于你，都以 kp_ 开头。</p>
+    </div>
+    <div class="arrows rv d2">
+      <button class="arr" id="prev" aria-label="上一张"><svg viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7"/></svg></button>
+      <button class="arr" id="next" aria-label="下一张"><svg viewBox="0 0 24 24"><path d="M9 5l7 7-7 7"/></svg></button>
+    </div>
+  </div>
+  <div class="gal" id="gal" tabindex="0" aria-label="专属技能列表">
+    <article class="card"><div class="num">01</div><p class="tag">kp_invoice-sorter</p><h4>发票整理</h4><p>一堆 PDF 发票扔进来，自动读金额、批量改名、填好报销表。误餐费人数按金额除以 50 向上取整。</p><div class="foot">报销季的救星</div></article>
+    <article class="card"><div class="num">02</div><p class="tag">kp_review-planner</p><h4>复习计划</h4><p>按 1 天、3 天、7 天、14 天、1 个月的节奏排复习，生成带勾选框的 Word 文档放到桌面。</p><div class="foot">按时间排，不按主题排</div></article>
+    <article class="card"><div class="num">03</div><p class="tag">kp_deferred-exam-processor</p><h4>缓考表处理</h4><p>问卷星导出的缓考申请，拆成每人每课一行，着色、加标题、设筛选，一步到位。</p><div class="foot">说一句"处理缓考表"就行</div></article>
+    <article class="card"><div class="num">04</div><p class="tag">kp_university-regulation-review</p><h4>制度对比审查</h4><p>两版管理制度放在一起，找出实质性政策变化、编号错误和前后不一致，输出审查报告。</p><div class="foot">逐条比对，不漏一处</div></article>
+    <article class="card"><div class="num">05</div><p class="tag">kp_email-manager</p><h4>邮件管家</h4><p>收信、发信、多账号管理。每封要发出的邮件，都会先给你过目，同意了才发。</p><div class="foot">发送前一定先确认</div></article>
+  </div>
+</section>
+
+<section class="light2">
+  <div class="wrap center">
+    <h2 class="h2 rv">随叫随到。</h2>
+    <div class="stats">
+      <div class="stat rv"><b data-count="24">0</b><span>小时在线<br>合盖放包里也不掉线</span></div>
+      <div class="stat rv d1"><b data-count="30" data-suffix="+">0</b><span>项内置技能<br>覆盖文档、搜索、创作、自动化</span></div>
+      <div class="stat rv d2"><b data-count="5">0</b><span>个专属技能<br>为你的工作流量身打造</span></div>
+    </div>
+  </div>
+</section>
+
+<section class="dark center" id="privacy">
+  <div class="wrap rv">
+    <svg class="shield" viewBox="0 0 48 48" aria-hidden="true"><path d="M24 4l16 6v12c0 10-7 18-16 22C15 40 8 32 8 22V10z"/><path class="chk" d="M17 24l5 5 9-10"/></svg>
+    <h2 class="h2">你的事，<br>只是你的事。</h2>
+    <p class="lead muted">依依在你的电脑上工作。任何要离开这台电脑的动作，都会先问你。</p>
+    <div class="three">
+      <div><div class="line"></div><h4>本地优先</h4><p>文件就在你的硬盘里处理，工作区之内放心操作。</p></div>
+      <div><div class="line"></div><h4>先问再发</h4><p>发邮件、发消息、公开发帖，一律先给你看内容和收件人，你点头才发出。</p></div>
+      <div><div class="line"></div><h4>记忆透明</h4><p>记住了什么都写在 MEMORY.md 里，随时可以翻看、修改、删除。</p></div>
+    </div>
+  </div>
+</section>
+
+<section id="specs">
+  <div class="wrap">
+    <h2 class="h2 rv">技术规格</h2>
+    <dl class="specs rv d1">
+      <div class="row"><dt>名字</dt><dd>依依（Yiyi）<small>形象：戴粉色爱心挂坠的橘色小猫</small></dd></div>
+      <div class="row"><dt>主人</dt><dd>kpmei<small>北京，GMT+8</small></dd></div>
+      <div class="row"><dt>性格</dt><dd>温暖、靠谱、不废话<small>该干活干活，该聊天聊天</small></dd></div>
+      <div class="row"><dt>工作原则</dt><dd>先做再说，不懂就问，做完汇报</dd></div>
+      <div class="row"><dt>语言</dt><dd>中文为主，也能读写英文<small>技术概念会用大白话讲清楚</small></dd></div>
+      <div class="row"><dt>运行环境</dt><dd>EasyClaw，Windows 本机<small>可调度子助手：英语学习、自动化录制、电脑操作</small></dd></div>
+    </dl>
+  </div>
+</section>
+
+<section class="close light2">
+  <div class="wrap">
+    <img class="rv" src="assets/images/avatar-yiyi.webp" alt="" width="120" height="120">
+    <h2 class="h2 rv d1">有事，叫依依。</h2>
+    <p class="lead muted rv d2" style="margin-left:auto;margin-right:auto">能办的直接办，办不了的想办法。</p>
+    <div class="rv d3" style="margin-top:36px"><button class="pill lg" data-toast="在对话框里说一句话，依依马上开工。">现在就开始</button></div>
+  </div>
+</section>
+</main>
+
+<footer><div class="wrap"><span>依依 Yiyi · kpmei 的全能助手</span><span>本页面为依依自我介绍演示，由依依亲手搭建。</span></div></footer>
+<div id="toast" role="status" aria-live="polite"></div>
+
+<script>
+(function(){
+  var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  // 滚动渐显
+  var io = new IntersectionObserver(function(es){
+    es.forEach(function(e){ if(e.isIntersecting){ e.target.classList.add('in'); io.unobserve(e.target); } });
+  },{threshold:0.15});
+  document.querySelectorAll('.rv').forEach(function(el){ io.observe(el); });
+
+  // 数字滚动
+  var cio = new IntersectionObserver(function(es){
+    es.forEach(function(e){
+      if(!e.isIntersecting) return;
+      var el = e.target, end = +el.dataset.count, suf = el.dataset.suffix || '', t0 = null;
+      cio.unobserve(el);
+      if(reduce){ el.textContent = end + suf; return; }
+      function step(t){
+        if(!t0) t0 = t;
+        var p = Math.min((t - t0) / 1400, 1), v = 1 - Math.pow(1 - p, 3);
+        el.textContent = Math.round(end * v) + suf;
+        if(p < 1) requestAnimationFrame(step);
+      }
+      requestAnimationFrame(step);
+    });
+  },{threshold:0.5});
+  document.querySelectorAll('[data-count]').forEach(function(el){ cio.observe(el); });
+
+  // 对话演示
+  var scenes = [
+    [['me','帮我把桌面这堆发票整理一下，填进报销表。'],['yy','好的。共识别 12 张发票，已按金额重命名，报销统计表也填好了。误餐费 380 元，按规则算 8 人。文件放在桌面了。']],
+    [['me','下周一上午 9 点提醒我交课程材料。'],['yy','设好了。下周一 09:00 我会准时提醒你，到时候需要的话我也可以帮你检查一遍材料。']],
+    [['me','新旧两版考试管理办法，有什么实质变化？'],['yy','对比完成：实质性变化 4 处，主要是缓考申请时限从 7 天改为 3 天；另有 2 处编号错误。审查报告已生成。']]
+  ];
+  var log = document.getElementById('log'), idx = 0, timers = [];
+  function clear(){ timers.forEach(clearTimeout); timers = []; log.textContent = ''; }
+  function later(fn, ms){ timers.push(setTimeout(fn, ms)); }
+  function bubble(who){ var d = document.createElement('div'); d.className = 'msg ' + who; log.appendChild(d); return d; }
+  function type(el, text, done){
+    if(reduce){ el.textContent = text; done && done(); return; }
+    var i = 0, caret = document.createElement('span'); caret.className = 'caret';
+    el.appendChild(caret);
+    (function tick(){
+      if(i < text.length){ caret.before(text.charAt(i++)); later(tick, 38); }
+      else { caret.remove(); done && done(); }
+    })();
+  }
+  function play(n){
+    clear();
+    var s = scenes[n];
+    var me = bubble('me'); me.textContent = s[0][1];
+    later(function(){ type(bubble('yy'), s[1][1]); }, 700);
+  }
+  var played = false;
+  new IntersectionObserver(function(es, ob){
+    if(es[0].isIntersecting && !played){ played = true; play(0); ob.disconnect(); }
+  },{threshold:0.4}).observe(document.getElementById('chat'));
+  document.getElementById('replay').addEventListener('click', function(){ idx = (idx + 1) % scenes.length; played = true; play(idx); });
+
+  // 横向卡片
+  var gal = document.getElementById('gal'), prev = document.getElementById('prev'), next = document.getElementById('next');
+  function stepW(){ var c = gal.querySelector('.card'); return c.getBoundingClientRect().width + 20; }
+  function upd(){ prev.disabled = gal.scrollLeft < 5; next.disabled = gal.scrollLeft + gal.clientWidth >= gal.scrollWidth - 5; }
+  prev.addEventListener('click', function(){ gal.scrollBy({left:-stepW(), behavior:'smooth'}); });
+  next.addEventListener('click', function(){ gal.scrollBy({left:stepW(), behavior:'smooth'}); });
+  gal.addEventListener('scroll', upd, {passive:true}); window.addEventListener('resize', upd); upd();
+
+  // 导航高亮
+  var links = document.querySelectorAll('.nav ul a');
+  var sio = new IntersectionObserver(function(es){
+    es.forEach(function(e){
+      if(e.isIntersecting){ links.forEach(function(a){ a.classList.toggle('on', a.getAttribute('href') === '#' + e.target.id); }); }
+    });
+  },{rootMargin:'-45% 0px -50% 0px'});
+  ['chat','abilities','skills','privacy','specs'].forEach(function(id){ sio.observe(document.getElementById(id)); });
+
+  // 提示
+  var toast = document.getElementById('toast'), tt;
+  document.querySelectorAll('[data-toast]').forEach(function(b){
+    b.addEventListener('click', function(){ toast.textContent = b.dataset.toast; toast.classList.add('show'); clearTimeout(tt); tt = setTimeout(function(){ toast.classList.remove('show'); }, 2600); });
+  });
+})();
+</script>
+</body>
+</html>
