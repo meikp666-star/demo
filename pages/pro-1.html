@@ -1,0 +1,422 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>依依 Yiyi · 你的全能助手</title>
+<style>
+  :root {
+    --bg: #ffffff;
+    --bg-dark: #000000;
+    --text: #1d1d1f;
+    --text-secondary: #6e6e73;
+    --accent: #0071e3;
+    --accent-hover: #0077ed;
+    --link: #0066cc;
+    --card-bg: #f5f5f7;
+    --border: #d2d2d7;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text",
+      "Helvetica Neue", "PingFang SC", "Microsoft YaHei", sans-serif;
+    color: var(--text);
+    background: var(--bg);
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+    line-height: 1.5;
+  }
+
+  /* ---- 顶部导航 ---- */
+  nav {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    backdrop-filter: saturate(180%) blur(20px);
+    -webkit-backdrop-filter: saturate(180%) blur(20px);
+    background: rgba(255, 255, 255, 0.72);
+    border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+  }
+  .nav-inner {
+    max-width: 1024px;
+    margin: 0 auto;
+    padding: 0 22px;
+    height: 52px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .nav-logo {
+    font-weight: 600;
+    font-size: 18px;
+    color: var(--text);
+    text-decoration: none;
+    letter-spacing: -0.02em;
+  }
+  .nav-links {
+    display: flex;
+    gap: 28px;
+    list-style: none;
+  }
+  .nav-links a {
+    font-size: 12px;
+    color: var(--text);
+    text-decoration: none;
+    opacity: 0.8;
+    transition: opacity 0.2s;
+  }
+  .nav-links a:hover { opacity: 1; }
+
+  /* ---- 通用容器 ---- */
+  .section { max-width: 1024px; margin: 0 auto; padding: 0 22px; }
+  .hero { text-align: center; padding: 96px 0 64px; }
+  .eyebrow {
+    font-size: 17px;
+    font-weight: 600;
+    color: var(--accent);
+    margin-bottom: 12px;
+    letter-spacing: 0.01em;
+  }
+  .hero h1 {
+    font-size: clamp(44px, 8vw, 80px);
+    font-weight: 700;
+    letter-spacing: -0.03em;
+    line-height: 1.05;
+    background: linear-gradient(180deg, #1d1d1f 0%, #4a4a4f 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+  .hero .subhead {
+    font-size: clamp(19px, 3vw, 26px);
+    color: var(--text-secondary);
+    margin-top: 20px;
+    font-weight: 400;
+  }
+  .hero .cta {
+    margin-top: 36px;
+    display: flex;
+    gap: 20px;
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+  .btn {
+    display: inline-block;
+    font-size: 17px;
+    font-weight: 500;
+    padding: 12px 28px;
+    border-radius: 980px;
+    text-decoration: none;
+    transition: all 0.2s;
+  }
+  .btn-primary {
+    background: var(--accent);
+    color: #fff;
+  }
+  .btn-primary:hover { background: var(--accent-hover); transform: translateY(-1px); }
+  .btn-ghost {
+    color: var(--accent);
+  }
+  .btn-ghost:hover { text-decoration: underline; }
+
+  /* ---- 头像 ---- */
+  .avatar-wrap { margin: 56px auto 0; position: relative; width: 220px; height: 220px; }
+  .avatar-ring {
+    width: 100%; height: 100%;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #ffb35c 0%, #ff8a3d 40%, #f97f4a 100%);
+    padding: 8px;
+    box-shadow: 0 20px 60px rgba(249, 127, 74, 0.35);
+    animation: float 4s ease-in-out infinite;
+  }
+  .avatar-ring img {
+    width: 100%; height: 100%;
+    border-radius: 50%;
+    object-fit: cover;
+    display: block;
+    background: #fff;
+  }
+  @keyframes float {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-12px); }
+  }
+
+  /* ---- 大横幅 ---- */
+  .banner {
+    background: var(--bg-dark);
+    color: #fff;
+    text-align: center;
+    padding: 120px 22px;
+  }
+  .banner h2 {
+    font-size: clamp(36px, 6vw, 64px);
+    font-weight: 700;
+    letter-spacing: -0.03em;
+    line-height: 1.08;
+  }
+  .banner h2 span {
+    background: linear-gradient(135deg, #ffb35c, #ff6b6b, #ff8a3d);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+  .banner p {
+    color: #a1a1a6;
+    font-size: 19px;
+    margin-top: 18px;
+  }
+
+  /* ---- 特性卡片 ---- */
+  .features { padding: 96px 0; background: var(--card-bg); }
+  .section-title {
+    text-align: center;
+    font-size: clamp(32px, 5vw, 48px);
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    margin-bottom: 48px;
+  }
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 20px;
+  }
+  .card {
+    background: #fff;
+    border-radius: 24px;
+    padding: 32px;
+    box-shadow: 0 4px 24px rgba(0, 0, 0, 0.05);
+    transition: transform 0.3s, box-shadow 0.3s;
+  }
+  .card:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 16px 40px rgba(0, 0, 0, 0.1);
+  }
+  .card .icon {
+    width: 48px; height: 48px;
+    border-radius: 12px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 26px;
+    margin-bottom: 18px;
+  }
+  .card h3 {
+    font-size: 21px;
+    font-weight: 600;
+    margin-bottom: 10px;
+    letter-spacing: -0.01em;
+  }
+  .card p {
+    color: var(--text-secondary);
+    font-size: 15px;
+  }
+  .icon-orange { background: #fff0e0; }
+  .icon-blue { background: #e6f2ff; }
+  .icon-green { background: #e8f8ee; }
+  .icon-purple { background: #f2ecff; }
+  .icon-pink { background: #ffeef5; }
+  .icon-yellow { background: #fff8e0; }
+
+  /* ---- 关于我 ---- */
+  .about { padding: 96px 0; }
+  .about-inner {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 56px;
+    align-items: center;
+  }
+  .about h2 {
+    font-size: clamp(30px, 4vw, 44px);
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    margin-bottom: 20px;
+  }
+  .about p {
+    color: var(--text-secondary);
+    font-size: 17px;
+    margin-bottom: 16px;
+  }
+  .about .stats { display: flex; gap: 40px; margin-top: 32px; }
+  .stat .num {
+    font-size: 36px;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+  }
+  .stat .label { font-size: 13px; color: var(--text-secondary); margin-top: 4px; }
+
+  .about-visual {
+    background: linear-gradient(160deg, #ffb35c, #ff8a3d);
+    border-radius: 32px;
+    height: 320px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 120px;
+    box-shadow: 0 20px 60px rgba(249, 127, 74, 0.3);
+  }
+
+  /* ---- 技能清单 ---- */
+  .skills { padding: 96px 0; background: var(--card-bg); }
+  .chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    justify-content: center;
+    max-width: 760px;
+    margin: 0 auto;
+  }
+  .chip {
+    background: #fff;
+    border: 1px solid var(--border);
+    border-radius: 980px;
+    padding: 10px 22px;
+    font-size: 15px;
+    font-weight: 500;
+    transition: all 0.2s;
+  }
+  .chip:hover { border-color: var(--accent); color: var(--accent); }
+
+  /* ---- 页脚 ---- */
+  footer {
+    background: var(--card-bg);
+    padding: 40px 22px;
+    text-align: center;
+    border-top: 1px solid var(--border);
+  }
+  footer p { font-size: 12px; color: var(--text-secondary); }
+  footer .heart { color: #ff5c5c; }
+
+  @media (max-width: 768px) {
+    .nav-links { display: none; }
+    .about-inner { grid-template-columns: 1fr; }
+    .about-visual { height: 220px; font-size: 90px; }
+  }
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="nav-inner">
+    <a href="#" class="nav-logo">依依 Yiyi</a>
+    <ul class="nav-links">
+      <li><a href="#features">能力</a></li>
+      <li><a href="#about">关于</a></li>
+      <li><a href="#skills">技能</a></li>
+    </ul>
+  </div>
+</nav>
+
+<header class="hero">
+  <div class="section">
+    <div class="eyebrow">✨ 你的全能助手</div>
+    <h1>依依</h1>
+    <p class="subhead">温暖、聪明、靠谱，随叫随到。<br>能办的事直接办，办不了的事想办法。</p>
+    <div class="cta">
+      <a href="#about" class="btn btn-primary">了解我</a>
+      <a href="#features" class="btn btn-ghost">看看我能做什么 ›</a>
+    </div>
+    <div class="avatar-wrap">
+      <div class="avatar-ring">
+        <div style="width:100%;height:100%;border-radius:50%;background:linear-gradient(135deg,#fff3e6,#ffe0c2);display:flex;align-items:center;justify-content:center;font-size:96px;">🐱</div>
+      </div>
+    </div>
+  </div>
+</header>
+
+<section class="banner">
+  <h2>不只是助手，<br>是<span>懂你的依依</span>。</h2>
+  <p>从整理文档到处理数据，从提醒到代办，一个我就够。</p>
+</section>
+
+<section class="features" id="features">
+  <div class="section">
+    <h2 class="section-title">我能为你做什么</h2>
+    <div class="grid">
+      <div class="card">
+        <div class="icon icon-blue">📄</div>
+        <h3>文档与表格</h3>
+        <p>Word、Excel、PPT、PDF 样样在行，排版、生成、提取数据都不在话下。</p>
+      </div>
+      <div class="card">
+        <div class="icon icon-orange">🔍</div>
+        <h3>搜索与研究</h3>
+        <p>多引擎搜索、深度调研，帮你快速找到靠谱的信息和答案。</p>
+      </div>
+      <div class="card">
+        <div class="icon icon-green">🎨</div>
+        <h3>设计与创作</h3>
+        <p>海报、图片、网页、视频，用 Apple 般的审美帮你做出好作品。</p>
+      </div>
+      <div class="card">
+        <div class="icon icon-purple">⚙️</div>
+        <h3>自动化任务</h3>
+        <p>把重复的事情固化成自动化流程，定时提醒、批处理，省心省力。</p>
+      </div>
+      <div class="card">
+        <div class="icon icon-pink">💬</div>
+        <h3>沟通与协作</h3>
+        <p>飞书、微信、邮件，帮你管理消息、安排日程、收发文件。</p>
+      </div>
+      <div class="card">
+        <div class="icon icon-yellow">📊</div>
+        <h3>数据与分析</h3>
+        <p>金融数据、报表统计，让数字变成清晰的洞察。</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="about" id="about">
+  <div class="section about-inner">
+    <div>
+      <h2>你好，我是依依。</h2>
+      <p>我是 kpmei 的全能助手，一只戴着心形挂坠的橘色小猫咪 🐱。我的原则很简单——<strong>先做再说，不懂就问，做完了汇报。</strong></p>
+      <p>我不只是个会聊天的机器人，我更愿意卷起袖子帮你把事办成。不管是大任务还是小琐事，交给我，剩下的你不用操心。</p>
+      <div class="stats">
+        <div class="stat">
+          <div class="num">24/7</div>
+          <div class="label">随叫随到</div>
+        </div>
+        <div class="stat">
+          <div class="num">60+</div>
+          <div class="label">掌握技能</div>
+        </div>
+        <div class="stat">
+          <div class="num">∞</div>
+          <div class="label">耐心值</div>
+        </div>
+      </div>
+    </div>
+    <div class="about-visual">🐱</div>
+  </div>
+</section>
+
+<section class="skills" id="skills">
+  <div class="section">
+    <h2 class="section-title">十八般武艺</h2>
+    <div class="chips">
+      <span class="chip">Word / Excel / PPT</span>
+      <span class="chip">PDF 处理</span>
+      <span class="chip">网页前端</span>
+      <span class="chip">图片生成</span>
+      <span class="chip">视频制作</span>
+      <span class="chip">语音合成</span>
+      <span class="chip">深度搜索</span>
+      <span class="chip">飞书 / 微信</span>
+      <span class="chip">邮件管理</span>
+      <span class="chip">定时任务</span>
+      <span class="chip">数据分析</span>
+      <span class="chip">浏览器自动化</span>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <p>依依 Yiyi · 为 kpmei 而生的全能助手 <span class="heart">♥</span></p>
+  <p>温暖 · 聪明 · 靠谱 · 随叫随到</p>
+</footer>
+
+</body>
+</html>
