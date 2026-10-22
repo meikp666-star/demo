@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>2023 北京卷第 15 题 · 分段函数四个结论</title>
+<style>
+  * { box-sizing: border-box; }
+  body { margin: 0; font-family: "Microsoft YaHei", "PingFang SC", sans-serif; background: #f5f7fb; color: #222; }
+  header { text-align: center; padding: 18px 10px 6px; }
+  header h1 { margin: 0; font-size: 22px; }
+  header p { margin: 6px 0 0; color: #666; font-size: 14px; }
+  .wrap { max-width: 1200px; margin: 0 auto; padding: 12px; display: flex; gap: 16px; flex-wrap: wrap; justify-content: center; }
+  .card { background: #fff; border-radius: 12px; box-shadow: 0 2px 10px rgba(0,0,0,.06); padding: 16px; }
+  .left { flex: 1 1 560px; max-width: 680px; }
+  .right { flex: 1 1 400px; max-width: 500px; }
+  .problem { line-height: 1.9; font-size: 15px; }
+  .brace { display: inline-flex; align-items: center; vertical-align: middle; }
+  .brace .b { font-size: 54px; font-weight: 200; line-height: 1; margin-right: 4px; }
+  .brace .cases { display: flex; flex-direction: column; font-size: 14px; line-height: 1.6; }
+  canvas { width: 100%; height: 460px; border: 1px solid #e3e6ee; border-radius: 8px; cursor: grab; display: block; touch-action: none; }
+  canvas:active { cursor: grabbing; }
+  .ctrl { display: flex; align-items: center; gap: 10px; margin: 12px 0 4px; flex-wrap: wrap; }
+  .ctrl input[type=range] { flex: 1; min-width: 180px; }
+  .ctrl b { color: #d6336c; min-width: 70px; display: inline-block; }
+  .tip { font-size: 12px; color: #888; }
+  button { border: 1px solid #ccd; background: #fff; border-radius: 6px; padding: 4px 10px; cursor: pointer; font-size: 13px; }
+  button:hover { background: #eef2ff; }
+  .tabs { display: flex; gap: 6px; margin-bottom: 10px; flex-wrap: wrap; }
+  .tabs button { flex: 1; padding: 8px 4px; font-size: 15px; }
+  .tabs button.on { background: #4263eb; color: #fff; border-color: #4263eb; }
+  .exp { line-height: 1.85; font-size: 15px; min-height: 280px; }
+  .exp h3 { margin: 4px 0 8px; font-size: 17px; }
+  .ok { color: #2b8a3e; font-weight: bold; }
+  .no { color: #e03131; font-weight: bold; }
+  .live { background: #fff9db; border-left: 4px solid #fab005; padding: 6px 10px; margin-top: 10px; border-radius: 4px; font-size: 14px; }
+  .answer { text-align: center; font-size: 20px; margin-top: 14px; padding: 12px; background: #ebfbee; border-radius: 10px; }
+  .legend { font-size: 13px; color: #555; margin-top: 6px; }
+  .legend span { display: inline-block; margin-right: 12px; }
+  .dot { display: inline-block; width: 12px; height: 4px; vertical-align: middle; margin-right: 4px; border-radius: 2px; }
+</style>
+</head>
+<body>
+<header>
+  <h1>2023 北京卷 第 15 题（5 分）</h1>
+  <p>拖动滑块改变 a，看图像怎么变 · 滚轮缩放 · 拖拽平移 · 双击复位</p>
+</header>
+
+<div class="wrap">
+  <div class="card left">
+    <div class="problem">
+      设 a &gt; 0，函数 f(x) =
+      <span class="brace"><span class="b">{</span><span class="cases">
+        <span>x + 2,　　　 x &lt; −a</span>
+        <span>√(a² − x²),　 −a ≤ x ≤ a</span>
+        <span>−√x − 1,　　 x &gt; a</span>
+      </span></span>
+    </div>
+    <div class="ctrl">
+      <span>a =</span><b id="aval">0.50</b>
+      <input type="range" id="a" min="0.05" max="2.5" step="0.01" value="0.5">
+      <button id="reset">复位视图</button>
+    </div>
+    <div class="ctrl">
+      快捷取值：
+      <button data-a="0.5">a = 0.5</button>
+      <button data-a="0.8">a = 0.8</button>
+      <button data-a="1">a = 1</button>
+      <button data-a="1.5">a = 1.5</button>
+    </div>
+    <canvas id="cv"></canvas>
+    <div class="legend">
+      <span><i class="dot" style="background:#4263eb"></i>x+2（射线）</span>
+      <span><i class="dot" style="background:#e8590c"></i>半圆 √(a²−x²)</span>
+      <span><i class="dot" style="background:#2b8a3e"></i>−√x−1</span>
+      <span>○ 空心＝取不到　● 实心＝取得到</span>
+    </div>
+  </div>
+
+  <div class="card right">
+    <div class="tabs">
+      <button data-k="1" class="on">结论①</button>
+      <button data-k="2">结论②</button>
+      <button data-k="3">结论③</button>
+      <button data-k="4">结论④</button>
+    </div>
+    <div class="exp" id="exp"></div>
+    <div class="answer">正确结论：<b style="color:#2b8a3e">② ③</b></div>
+  </div>
+</div>
+
+<script>
+const cv = document.getElementById('cv');
+const ctx = cv.getContext('2d');
+const slider = document.getElementById('a');
+const aval = document.getElementById('aval');
+const exp = document.getElementById('exp');
+let a = 0.5, mode = 1;
+let view = { cx: 0, cy: 0, s: 60 }; // 视图中心(世界坐标) 与 每单位像素数
+const DEFAULT = { cx: 0, cy: 0, s: 60 };
+
+function resize() {
+  const r = cv.getBoundingClientRect(), d = window.devicePixelRatio || 1;
+  cv.width = r.width * d; cv.height = r.height * d;
+  ctx.setTransform(d, 0, 0, d, 0, 0);
+  draw();
+}
+const W = () => cv.getBoundingClientRect().width;
+const H = () => cv.getBoundingClientRect().height;
+const X = x => W() / 2 + (x - view.cx) * view.s;
+const Y = y => H() / 2 - (y - view.cy) * view.s;
+const iX = px => (px - W() / 2) / view.s + view.cx;
+const iY = py => -(py - H() / 2) / view.s + view.cy;
+
+function niceStep() {
+  const raw = 80 / view.s, p = Math.pow(10, Math.floor(Math.log10(raw)));
+  for (const m of [1, 2, 5, 10]) if (m * p >= raw) return m * p;
+}
+
+function grid() {
+  const st = niceStep(), x0 = iX(0), x1 = iX(W()), y0 = iY(H()), y1 = iY(0);
+  ctx.lineWidth = 1; ctx.font = '11px sans-serif'; ctx.fillStyle = '#999';
+  for (let x = Math.ceil(x0 / st) * st; x <= x1; x += st) {
+    ctx.strokeStyle = '#eef0f4'; line(X(x), 0, X(x), H());
+    if (Math.abs(x) > 1e-9) ctx.fillText(+x.toFixed(6), X(x) + 2, Math.min(Math.max(Y(0) + 12, 12), H() - 3));
+  }
+  for (let y = Math.ceil(y0 / st) * st; y <= y1; y += st) {
+    ctx.strokeStyle = '#eef0f4'; line(0, Y(y), W(), Y(y));
+    if (Math.abs(y) > 1e-9) ctx.fillText(+y.toFixed(6), Math.min(Math.max(X(0) + 3, 3), W() - 30), Y(y) - 2);
+  }
+  ctx.strokeStyle = '#555'; ctx.lineWidth = 1.3;
+  line(0, Y(0), W(), Y(0)); line(X(0), 0, X(0), H());
+  ctx.fillStyle = '#555'; ctx.fillText('O', X(0) - 12, Y(0) + 12);
+  ctx.fillText('x', W() - 10, Y(0) - 4); ctx.fillText('y', X(0) + 4, 10);
+}
+function line(x1, y1, x2, y2) { ctx.beginPath(); ctx.moveTo(x1, y1); ctx.lineTo(x2, y2); ctx.stroke(); }
+function wline(x1, y1, x2, y2) { line(X(x1), Y(y1), X(x2), Y(y2)); }
+function dot(x, y, color, hollow, r = 4.5) {
+  ctx.beginPath(); ctx.arc(X(x), Y(y), r, 0, 7);
+  ctx.fillStyle = hollow ? '#fff' : color; ctx.fill();
+  ctx.strokeStyle = color; ctx.lineWidth = 2; ctx.stroke();
+}
+function label(t, x, y, color = '#333', dx = 6, dy = -6) {
+  ctx.fillStyle = color; ctx.font = 'bold 13px "Microsoft YaHei"'; ctx.fillText(t, X(x) + dx, Y(y) + dy);
+}
+function curve(f, xa, xb, color, w = 3) {
+  ctx.strokeStyle = color; ctx.lineWidth = w; ctx.beginPath();
+  const n = 400; for (let i = 0; i <= n; i++) {
+    const x = xa + (xb - xa) * i / n, px = X(x), py = Y(f(x));
+    i ? ctx.lineTo(px, py) : ctx.moveTo(px, py);
+  } ctx.stroke();
+}
+
+function drawF() {
+  const left = Math.min(iX(0), -a) - 1, right = Math.max(iX(W()), a) + 1;
+  curve(x => x + 2, left, -a, '#4263eb');
+  curve(x => Math.sqrt(Math.max(0, a * a - x * x)), -a, a, '#e8590c');
+  curve(x => -Math.sqrt(x) - 1, a, right, '#2b8a3e');
+  dot(-a, -a + 2, '#4263eb', true);
+  dot(-a, 0, '#e8590c', false); dot(a, 0, '#e8590c', false);
+  dot(a, -Math.sqrt(a) - 1, '#2b8a3e', true);
+}
+
+function overlay() {
+  ctx.setLineDash([]);
+  if (mode === 1) {
+    // 区间 (a-1, +∞) 着色
+    ctx.fillStyle = 'rgba(66,99,235,.07)';
+    ctx.fillRect(X(a - 1), 0, W() - X(a - 1), H());
+    ctx.setLineDash([6, 4]); ctx.strokeStyle = '#4263eb'; ctx.lineWidth = 1.5;
+    wline(a - 1, iY(0), a - 1, iY(H())); ctx.setLineDash([]);
+    label('x = a−1', a - 1, iY(20), '#4263eb');
+    if (a - 1 < 0) {
+      const l = Math.max(a - 1, -a);
+      curve(x => Math.sqrt(Math.max(0, a * a - x * x)), l, 0, '#d6336c', 6);
+      label('这一段在上升！', (l) / 2, Math.sqrt(a * a - (l / 2) ** 2), '#d6336c', -40, -14);
+    }
+  }
+  if (mode === 2) {
+    ctx.setLineDash([6, 4]); ctx.strokeStyle = '#d6336c'; ctx.lineWidth = 1.5;
+    wline(iX(0), a, iX(W()), a); ctx.setLineDash([]);
+    dot(0, a, '#d6336c', false, 6); label('(0, a)', 0, a, '#d6336c');
+    ctx.setLineDash([6, 4]); ctx.strokeStyle = '#4263eb';
+    wline(iX(0), 2 - a, iX(W()), 2 - a); ctx.setLineDash([]);
+    label('y = 2−a（射线到不了）', iX(10) , 2 - a, '#4263eb', 0, -4);
+  }
+  if (mode === 3) {
+    ctx.fillStyle = 'rgba(43,138,62,.08)';
+    ctx.fillRect(0, Y(-1), W(), H() - Y(-1));
+    ctx.setLineDash([6, 4]); ctx.strokeStyle = '#2b8a3e'; ctx.lineWidth = 1.5;
+    wline(iX(0), -1, iX(W()), -1); ctx.setLineDash([]);
+    label('y = −1（N 全在这条线下方）', iX(10), -1, '#2b8a3e', 0, 16);
+    // 示例：半圆上 M 与 N
+    const xn = a + 1, yn = -Math.sqrt(xn) - 1;
+    dot(0, a, '#e8590c', false, 5); label('M', 0, a, '#e8590c');
+    dot(xn, yn, '#2b8a3e', false, 5); label('N', xn, yn, '#2b8a3e');
+    ctx.strokeStyle = '#d6336c'; ctx.lineWidth = 2; wline(0, a, xn, yn);
+    // 射线上的 M' 到 N 用直线距离说明
+    const xm = -a - 1.2;
+    dot(xm, xm + 2, '#4263eb', false, 5); label("M'", xm, xm + 2, '#4263eb', -24);
+    ctx.setLineDash([4, 4]); ctx.strokeStyle = '#d6336c'; wline(xm, xm + 2, xn, yn); ctx.setLineDash([]);
+  }
+  if (mode === 4) {
+    ctx.setLineDash([6, 4]); ctx.strokeStyle = '#adb5bd'; ctx.lineWidth = 1.5;
+    curve(x => x + 2, -a, iX(W()) + 1, '#ced4da', 1.5); // 射线被删掉的部分（虚）
+    wline(0, 0, -1, 1); ctx.setLineDash([]);
+    dot(-1, 1, a < 1 ? '#d6336c' : '#adb5bd', a >= 1, 5);
+    label('垂足 (−1, 1)', -1, 1, a < 1 ? '#d6336c' : '#868e96', -88, -8);
+    const qx = -a / Math.SQRT2, qy = a / Math.SQRT2;
+    if (a < 1) {
+      dot(qx, qy, '#e8590c', false, 5); label('Q', qx, qy, '#e8590c', 6, 14);
+      ctx.strokeStyle = '#d6336c'; ctx.lineWidth = 3; wline(-1, 1, qx, qy);
+    } else {
+      dot(-a, 0, '#e8590c', false, 5); label('Q', -a, 0, '#e8590c', 6, 14);
+      ctx.strokeStyle = '#d6336c'; ctx.lineWidth = 2; ctx.setLineDash([4, 4]);
+      wline(-a, 2 - a, -a, 0); ctx.setLineDash([]);
+      label('P 只能无限逼近空心点', -a, 2 - a, '#d6336c', -150, -10);
+    }
+  }
+}
+
+function draw() {
+  ctx.clearRect(0, 0, W(), H());
+  grid(); drawF(); overlay();
+}
+
+const T = {
+  1: () => `<h3>① f(x) 在 (a−1, +∞) 上单调递减 —— <span class="no">错误</span></h3>
+    关键：半圆 √(a²−x²) 在 <b>[−a, 0]</b> 上是<b>上升</b>的。<br>
+    只要区间 (a−1, +∞) 里含有半圆的左半段，就不可能"一直下降"。<br>
+    <b>反例：</b>取 a = 1/2，区间是 (−1/2, +∞)，而 f 在 [−1/2, 0] 上从 0 升到 1/2，不是递减。<br>
+    （点上方"a = 0.5"按钮，图中粉色加粗的就是上升段）
+    <div class="live">当前 a = ${a.toFixed(2)}，区间 (${(a - 1).toFixed(2)}, +∞)：${a - 1 < 0 ? '包含上升段 → 不单调递减' : '此时恰好不含上升段，但①要求对所有 a>0 成立，一个反例就够了'}</div>`,
+  2: () => `<h3>② 当 a ≥ 1 时，f(x) 存在最大值 —— <span class="ok">正确</span></h3>
+    分三段看各自能到多高：<br>
+    • 射线 x+2（x&lt;−a）：y &lt; −a+2 ≤ <b>1</b>（取不到端点）<br>
+    • 半圆：最高点 (0, a)，最大值 <b>a ≥ 1</b><br>
+    • −√x−1（x&gt;a）：y &lt; −√a−1 &lt; 0<br>
+    所以 a ≥ 1 时半圆顶点 a 是最高的，最大值为 <b>a</b>。<br>
+    （若 0&lt;a&lt;1，射线左端逼近 2−a &gt; a 却取不到，就没有最大值。）
+    <div class="live">当前 a = ${a.toFixed(2)}：半圆最高 ${a.toFixed(2)}，射线上界 ${(2 - a).toFixed(2)}（取不到）→ ${a >= 1 ? '<span class="ok">最大值 = ' + a.toFixed(2) + '</span>' : '<span class="no">无最大值</span>'}</div>`,
+  3: () => `<h3>③ M(x₁≤a)、N(x₂&gt;a)，则 |MN| &gt; 1 —— <span class="ok">正确</span></h3>
+    N 在 −√x−1 上，x₂ &gt; a &gt; 0，所以 <b>y_N &lt; −1</b>（绿色区域）。<br>
+    <b>情形1：M 在半圆上。</b> y_M ≥ 0，竖直方向就差了大于 1：|MN| ≥ y_M − y_N &gt; 0 − (−1) = 1。<br>
+    <b>情形2：M 在射线 y=x+2 上。</b> |MN| ≥ N 到直线 x − y + 2 = 0 的距离<br>
+    = |x₂ − y₂ + 2| / √2 &gt; (0 + 1 + 2)/√2 = 3/√2 &gt; 1。<br>
+    两种情形都 &gt; 1，结论成立。`,
+  4: () => `<h3>④ |PQ| 有最小值 ⇔ a ∈ (0, 1/2] —— <span class="no">错误</span></h3>
+    P 在射线 y=x+2（x&lt;−a）上，离半圆最近的地方要看原点到直线的垂线：<br>
+    原点到直线 x−y+2=0 距离 = 2/√2 = √2，垂足为 <b>(−1, 1)</b>。<br>
+    • <b>0 &lt; a &lt; 1：</b>垂足 x = −1 &lt; −a，在射线上 ✓；半圆上对应点 (−a/√2, a/√2) 也在 ✓。<br>
+    　最小值 |PQ| = √2 − a，<b>能取到</b>。<br>
+    • <b>a ≥ 1：</b>垂足不在射线上，P 越往右越近，但右端点 (−a, 2−a) 是空心的，<b>取不到</b>，无最小值。<br>
+    所以正确范围是 <b>(0, 1)</b>，不是 (0, 1/2]。<br>
+    例如 a = 0.8 时最小值 √2 − 0.8 ≈ 0.614 存在，而 0.8 ∉ (0, 1/2]。
+    <div class="live">当前 a = ${a.toFixed(2)}：${a < 1 ? '最小值存在，= √2 − a ≈ ' + (Math.SQRT2 - a).toFixed(3) : '无最小值（只能无限逼近）'}</div>`
+};
+function render() { exp.innerHTML = T[mode](); draw(); }
+
+slider.oninput = () => { a = +slider.value; aval.textContent = a.toFixed(2); render(); };
+document.querySelectorAll('[data-a]').forEach(b => b.onclick = () => { slider.value = b.dataset.a; slider.oninput(); });
+document.querySelectorAll('.tabs button').forEach(b => b.onclick = () => {
+  document.querySelectorAll('.tabs button').forEach(x => x.classList.remove('on'));
+  b.classList.add('on'); mode = +b.dataset.k; render();
+});
+document.getElementById('reset').onclick = () => { view = { ...DEFAULT }; draw(); };
+
+// 缩放（以鼠标为中心）
+cv.addEventListener('wheel', e => {
+  e.preventDefault();
+  const r = cv.getBoundingClientRect(), mx = e.clientX - r.left, my = e.clientY - r.top;
+  const wx = iX(mx), wy = iY(my), k = e.deltaY < 0 ? 1.15 : 1 / 1.15;
+  view.s = Math.min(2000, Math.max(5, view.s * k));
+  view.cx = wx - (mx - W() / 2) / view.s; view.cy = wy + (my - H() / 2) / view.s;
+  draw();
+}, { passive: false });
+// 平移
+let drag = null;
+cv.addEventListener('pointerdown', e => { drag = { x: e.clientX, y: e.clientY, cx: view.cx, cy: view.cy }; cv.setPointerCapture(e.pointerId); });
+cv.addEventListener('pointermove', e => {
+  if (!drag) return;
+  view.cx = drag.cx - (e.clientX - drag.x) / view.s; view.cy = drag.cy + (e.clientY - drag.y) / view.s; draw();
+});
+cv.addEventListener('pointerup', () => drag = null);
+cv.addEventListener('dblclick', () => { view = { ...DEFAULT }; draw(); });
+window.addEventListener('resize', resize);
+resize(); render();
+</script>
+</body>
+</html>
