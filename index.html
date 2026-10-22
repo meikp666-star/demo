@@ -3,206 +3,489 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>我的导航站</title>
+<title>kpmei 的作品与导航</title>
 <style>
+  :root {
+    --bg: #f5f6f8; --panel: #fff; --text: #1d1d1f; --muted: #6e6e73; --line: #e5e5ea;
+    --accent: #ff7a00; --accent-soft: #fff1e5; --shadow: 0 1px 2px rgba(0,0,0,.04), 0 6px 20px rgba(0,0,0,.06);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root { --bg: #111214; --panel: #1c1d20; --text: #f2f2f4; --muted: #9a9aa1; --line: #2c2d31;
+      --accent-soft: rgba(255,122,0,.15); --shadow: 0 1px 2px rgba(0,0,0,.3), 0 6px 20px rgba(0,0,0,.3); }
+  }
   * { margin: 0; padding: 0; box-sizing: border-box; }
-  body {
-    font-family: -apple-system, "Microsoft YaHei", "PingFang SC", sans-serif;
-    background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
-    min-height: 100vh; padding: 40px 20px; color: #fff;
+  body { font-family: -apple-system, "PingFang SC", "Microsoft YaHei", sans-serif;
+    background: var(--bg); color: var(--text); line-height: 1.6; -webkit-font-smoothing: antialiased; }
+  a { color: inherit; text-decoration: none; }
+  .wrap { max-width: 1080px; margin: 0 auto; padding: 0 20px; }
+
+  /* 顶部 */
+  header { padding: 48px 0 8px; }
+  header h1 { font-size: 30px; letter-spacing: .5px; }
+  header p { color: var(--muted); margin-top: 4px; }
+
+  /* 搜索 */
+  .search { position: sticky; top: 0; z-index: 10; background: var(--bg); padding: 18px 0 12px; }
+  .search form { display: flex; align-items: center; gap: 10px; background: var(--panel);
+    border: 1px solid var(--line); border-radius: 14px; padding: 6px 6px 6px 16px; box-shadow: var(--shadow); }
+  .search form:focus-within { border-color: var(--accent); }
+  .search input { flex: 1; border: 0; outline: 0; background: transparent; color: var(--text); font-size: 16px; padding: 8px 0; }
+  .search kbd { font: 12px/1 monospace; color: var(--muted); border: 1px solid var(--line); border-radius: 6px; padding: 4px 7px; }
+  .search button { border: 0; background: var(--accent); color: #fff; font-size: 15px; padding: 10px 18px;
+    border-radius: 10px; cursor: pointer; }
+  .search button:hover { filter: brightness(.94); }
+  .hint { color: var(--muted); font-size: 13px; margin-top: 8px; min-height: 20px; }
+
+  /* 分类 */
+  .chips { display: flex; flex-wrap: wrap; gap: 8px; margin: 6px 0 18px; }
+  .chip { border: 1px solid var(--line); background: var(--panel); color: var(--text); font-size: 14px;
+    padding: 6px 14px; border-radius: 999px; cursor: pointer; transition: .15s; }
+  .chip:hover { border-color: var(--accent); }
+  .chip.on { background: var(--accent); border-color: var(--accent); color: #fff; }
+  .chip .n { opacity: .65; margin-left: 6px; font-size: 12px; font-variant-numeric: tabular-nums; }
+
+  h2 { font-size: 18px; margin: 10px 0 14px; display: flex; align-items: baseline; gap: 10px; }
+  h2 small { font-size: 13px; color: var(--muted); font-weight: normal; }
+
+  /* 作品卡片 */
+  .works { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 16px; }
+  .work { display: flex; flex-direction: column; background: var(--panel); border: 1px solid var(--line);
+    border-radius: 16px; padding: 20px; box-shadow: var(--shadow); transition: transform .15s, border-color .15s; }
+  .work:hover { transform: translateY(-3px); border-color: var(--accent); }
+  .work .top { display: flex; align-items: center; gap: 10px; margin-bottom: 12px; }
+  .work .ico { width: 40px; height: 40px; border-radius: 10px; display: grid; place-items: center; font-size: 20px; background: var(--accent-soft); }
+  .work .cat { font-size: 12px; color: var(--muted); }
+  .work .cat b { display: block; color: var(--accent); font-weight: 600; font-size: 12px; }
+  .work h3 { font-size: 17px; line-height: 1.4; margin-bottom: 6px; }
+  .work p { font-size: 14px; color: var(--muted); flex: 1; }
+  .stats { display: flex; gap: 0; margin-top: 14px; border-top: 1px solid var(--line); padding-top: 12px; }
+  .stats div { flex: 1; min-width: 0; }
+  .stats div + div { padding-left: 12px; border-left: 1px solid var(--line); }
+  .stats b { display: block; font-size: 16px; }
+  .stats span { font-size: 12px; color: var(--muted); }
+  .open { margin-top: 14px; font-size: 14px; color: var(--accent); font-weight: 600; }
+  .work .date { margin-left: auto; align-self: flex-start; font-size: 12px; color: var(--muted); white-space: nowrap; }
+  .work .new { margin-left: auto; align-self: flex-start; font-size: 11px; font-weight: 600; color: #fff; background: var(--accent); padding: 2px 8px; border-radius: 999px; }
+  .work .new + .date { margin-left: 6px; }
+
+  .empty { display: none; color: var(--muted); text-align: center; padding: 30px; border: 1px dashed var(--line); border-radius: 16px; }
+
+  /* 常用网站 */
+  .links { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 16px; }
+  .group { background: var(--panel); border: 1px solid var(--line); border-radius: 16px; padding: 16px 18px; }
+  .group h4 { font-size: 13px; color: var(--muted); font-weight: 600; margin-bottom: 10px; }
+  .group .list { display: grid; grid-template-columns: repeat(auto-fill, minmax(118px, 1fr)); gap: 6px; }
+  .site { display: flex; align-items: center; gap: 6px; padding: 8px; border-radius: 10px; font-size: 14px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .site:hover { background: var(--accent-soft); }
+  .site .ed { display: none; margin-left: auto; font-size: 12px; opacity: .7; }
+  .editing .site { border: 1px dashed var(--line); cursor: pointer; }
+  .editing .site:hover .ed { display: inline; }
+  .add-site { display: none; justify-content: center; color: var(--accent); border: 1px dashed var(--accent) !important; }
+  .editing .add-site { display: flex; }
+  .group h4 .ren { display: none; margin-left: 6px; cursor: pointer; font-weight: normal; color: var(--accent); }
+  .editing .group h4 .ren { display: inline; }
+
+  .links-bar { margin-top: 40px; display: flex; align-items: center; justify-content: space-between; gap: 10px; flex-wrap: wrap; }
+  .links-bar h2 { margin: 0; }
+  .links { margin-top: 14px !important; }
+  .bar-btns { display: flex; gap: 8px; }
+  .btn { border: 1px solid var(--accent); background: var(--accent); color: #fff; font-size: 14px; padding: 7px 14px; border-radius: 10px; cursor: pointer; font-family: inherit; }
+  .btn.ghost { background: transparent; color: var(--accent); }
+  .btn.danger { background: transparent; color: #e5484d; border-color: #e5484d; }
+  .btn:disabled { opacity: .5; cursor: default; }
+
+  .mask { position: fixed; inset: 0; background: rgba(0,0,0,.35); display: grid; place-items: center; z-index: 50; padding: 20px; }
+  .dlg { width: 100%; max-width: 380px; background: var(--panel); color: var(--text); border-radius: 16px; padding: 22px; box-shadow: 0 20px 60px rgba(0,0,0,.3); }
+  .dlg h3 { font-size: 17px; margin-bottom: 14px; }
+  .dlg label { display: block; font-size: 13px; color: var(--muted); margin: 10px 0 4px; }
+  .dlg input, .dlg select { width: 100%; padding: 9px 11px; border: 1px solid var(--line); border-radius: 10px; font-size: 15px; background: var(--bg); color: var(--text); font-family: inherit; }
+  .dlg input:focus, .dlg select:focus { outline: 2px solid var(--accent); border-color: transparent; }
+  .dlg-msg { font-size: 13px; color: var(--muted); min-height: 18px; margin-top: 10px; }
+  .dlg-msg.err { color: #e5484d; }
+  .dlg-btns { display: flex; gap: 8px; margin-top: 12px; }
+
+  .hide { display: none !important; }
+  footer { text-align: center; color: var(--muted); font-size: 13px; padding: 40px 0 30px; }
+  @media (max-width: 600px) {
+    header { padding-top: 32px; } header h1 { font-size: 24px; }
+    .works { grid-template-columns: 1fr; } .search kbd { display: none; }
   }
-  .header { text-align: center; margin-bottom: 40px; }
-  .header h1 { font-size: 2.2em; margin-bottom: 10px; letter-spacing: 2px; }
-  .header p { opacity: .8; font-size: .95em; }
-  .search-box {
-    max-width: 560px; margin: 24px auto 0; display: flex;
-    background: rgba(255,255,255,.95); border-radius: 50px; overflow: hidden;
-    box-shadow: 0 10px 30px rgba(0,0,0,.2);
-  }
-  .search-box input {
-    flex: 1; border: none; outline: none; padding: 16px 24px;
-    font-size: 16px; color: #333; background: transparent;
-  }
-  .search-box button {
-    border: none; padding: 0 32px; background: #ff7a00; color: #fff;
-    font-size: 16px; cursor: pointer; transition: .2s;
-  }
-  .search-box button:hover { background: #e56b00; }
-  .section { max-width: 1000px; margin: 0 auto 36px; }
-  .section h2 {
-    font-size: 1.05em; margin-bottom: 16px; opacity: .9;
-    border-left: 4px solid #ff7a00; padding-left: 10px;
-  }
-  .grid {
-    display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
-    gap: 14px;
-  }
-  .grid.wide { grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); }
-  .card {
-    display: flex; flex-direction: column; align-items: center; justify-content: center;
-    gap: 8px; padding: 20px 10px; border-radius: 14px;
-    background: rgba(255,255,255,.12); backdrop-filter: blur(6px);
-    color: #fff; text-decoration: none; font-size: .9em;
-    border: 1px solid rgba(255,255,255,.18);
-    transition: transform .18s, background .18s;
-  }
-  .card:hover { transform: translateY(-4px); background: rgba(255,255,255,.24); }
-  .card .ico { font-size: 1.8em; }
-  .card.highlight { background: rgba(255,122,0,.22); border-color: rgba(255,122,0,.5); }
-  .card.highlight:hover { background: rgba(255,122,0,.34); }
-  .card .sub { font-size: .78em; opacity: .7; }
-  .feature {
-    display: flex; gap: 24px; align-items: stretch; padding: 26px 28px; border-radius: 18px;
-    background: rgba(255,122,0,.18); border: 1px solid rgba(255,122,0,.5);
-    color: #fff; text-decoration: none; backdrop-filter: blur(6px);
-    transition: transform .18s, background .18s;
-  }
-  .feature:hover { transform: translateY(-4px); background: rgba(255,122,0,.28); }
-  .f-text { flex: 1; display: flex; flex-direction: column; gap: 10px; }
-  .f-tag { font-size: .78em; opacity: .8; letter-spacing: .5px; }
-  .f-text h3 { font-size: 1.35em; letter-spacing: 1px; }
-  .f-text p { font-size: .9em; opacity: .85; line-height: 1.7; }
-  .f-btn { align-self: flex-start; margin-top: 4px; background: #ff7a00; padding: 8px 20px; border-radius: 50px; font-size: .9em; }
-  .f-side { display: flex; flex-direction: column; justify-content: center; gap: 12px; min-width: 150px;
-    padding-left: 24px; border-left: 1px solid rgba(255,255,255,.2); }
-  .f-side div { display: flex; flex-direction: column; }
-  .f-side b { font-size: 1.4em; }
-  .f-side span { font-size: .75em; opacity: .7; }
-  @media (max-width: 640px) {
-    .feature { flex-direction: column; padding: 22px; }
-    .f-side { flex-direction: row; justify-content: space-between; padding-left: 0; padding-top: 14px;
-      border-left: 0; border-top: 1px solid rgba(255,255,255,.2); min-width: 0; }
-  }
-  .footer { text-align: center; opacity: .6; font-size: .8em; margin-top: 30px; }
 </style>
 </head>
 <body>
-  <div class="header">
-    <h1>🧭 我的导航站</h1>
-    <p>常用网站，一键直达</p>
-    <form class="search-box" onsubmit="event.preventDefault(); window.location.href='https://www.bing.com/search?q='+encodeURIComponent(this.q.value);">
-      <input name="q" type="text" placeholder="输入关键词搜索…" autocomplete="off">
+<div class="wrap">
+  <header>
+    <h1>✨ kpmei 的作品与导航</h1>
+    <p>依依做过的网页作品 + 常用网站，一页直达</p>
+  </header>
+
+  <div class="search">
+    <form id="sf">
+      <span>🔍</span>
+      <input id="q" type="text" placeholder="搜作品或网站，回车搜网络" autocomplete="off">
+      <kbd>/</kbd>
       <button type="submit">搜索</button>
     </form>
+    <div class="hint" id="hint"></div>
   </div>
 
-  <div class="section">
-    <h2>🤖 依依介绍页 · 模型对比</h2>
-    <a class="feature" href="pages/compare.html" target="_blank">
-      <div class="f-text">
-        <span class="f-tag">12 份作品 · Pro / Flash / Haiku / Sonnet / Opus 5.5 / GYXAPI</span>
+  <div class="chips" id="chips">
+    <button class="chip on" data-f="all">全部</button>
+    <button class="chip" data-f="model">🤖 模型对比</button>
+    <button class="chip" data-f="nsd">🎓 国发院</button>
+    <button class="chip" data-f="math">📐 数学讲解</button>
+    <button class="chip" data-f="links">🌐 常用网站</button>
+  </div>
+
+  <section id="worksSec">
+    <h2>我的作品 <small id="wcount"></small></h2>
+    <div class="works" id="works">
+
+      <a class="work" data-cat="model" data-date="2026-10-19 23:38" href="pages/compare.html" target="_blank">
+        <div class="top"><div class="ico">🤖</div><div class="cat"><b>模型对比</b>12 份作品 · Pro / Flash / Haiku / Sonnet / Opus 5.5 / GYXAPI</div></div>
         <h3>十二份答卷，一个依依。</h3>
-        <p>同一道题——「用苹果官方风格做一个介绍依依的 HTML 网页」，交给不同模型、不同轮次分别作答。花费从 ¥0.07 到 ¥20，耗时从 24 秒到 25 分钟。缩略图、参数对比表、双栏并排预览，一页看清。</p>
-        <span class="f-btn">进入对比页 →</span>
-      </div>
-      <div class="f-side">
-        <div><b>12</b><span>份作品</span></div>
-        <div><b>6</b><span>种模型 / 渠道</span></div>
-        <div><b>¥0.07–20</b><span>单次花费</span></div>
-      </div>
-    </a>
-  </div>
+        <p>同一道题——「用苹果官方风格做一个介绍依依的 HTML 网页」，交给不同模型、不同轮次分别作答。缩略图、参数对比表、双栏并排预览，一页看清。</p>
+        <div class="stats"><div><b>12</b><span>份作品</span></div><div><b>6</b><span>种模型 / 渠道</span></div><div><b>¥0.07–20</b><span>单次花费</span></div></div>
+        <div class="open">进入对比页 →</div>
+      </a>
 
-  <div class="section">
-    <h2>🎓 北大国发院 · 宣传页</h2>
-    <a class="feature" href="pages/nsd-minor-2027.html" target="_blank">
-      <div class="f-text">
-        <span class="f-tag">招生宣传 · 响应式网页 · 手机 / 平板 / 电脑自适应</span>
+      <a class="work" data-cat="nsd" data-date="2026-10-20 15:05" href="pages/nsd-minor-2027.html" target="_blank">
+        <div class="top"><div class="ico">🎓</div><div class="cat"><b>国发院 · 宣传页</b>响应式 · 手机 / 平板 / 电脑</div></div>
         <h3>2027 校外经济学辅修合作项目</h3>
-        <p>北京大学国家发展研究院校外经济学辅修招生宣传页：学院简介、项目优势、师资力量、培养方案、常见问题与报名方式，含报名截止倒计时。</p>
-        <span class="f-btn">打开宣传页 →</span>
-      </div>
-      <div class="f-side">
-        <div><b>30</b><span>周年</span></div>
-        <div><b>42</b><span>学分</span></div>
-        <div><b>44</b><span>门选修课</span></div>
-      </div>
-    </a>
-  </div>
+        <p>学院简介、项目优势、师资力量、培养方案、常见问题与报名方式，含报名截止倒计时。</p>
+        <div class="stats"><div><b>30</b><span>周年</span></div><div><b>42</b><span>学分</span></div><div><b>44</b><span>门选修课</span></div></div>
+        <div class="open">打开宣传页 →</div>
+      </a>
 
-  <div class="section">
-    <h2>🎓 北大国发院 · 一页纸简介</h2>
-    <a class="feature" href="pages/nsd-minor-2027-onepage.html" target="_blank">
-      <div class="f-text">
-        <span class="f-tag">招生一页纸 · A4 横版 · 可打印存 PDF</span>
-        <h3>2027 校外经济学辅修合作项目 · 一页纸</h3>
-        <p>项目优势、课程设置、招生与学习、报名截止与咨询方式，一页看清，扫码查看更多相关信息。</p>
-        <span class="f-btn">打开一页纸 →</span>
-      </div>
-      <div class="f-side">
-        <div><b>42</b><span>学分</span></div>
-        <div><b>63000</b><span>学费（元）</span></div>
-        <div><b>5/11</b><span>报名截止</span></div>
-      </div>
-    </a>
-  </div>
+      <a class="work" data-cat="nsd" data-date="2026-10-21 17:03" href="pages/nsd-minor-2027-onepage.html" target="_blank">
+        <div class="top"><div class="ico">📄</div><div class="cat"><b>国发院 · 一页纸</b>A4 横版 · 可打印存 PDF</div></div>
+        <h3>2027 辅修项目 · 一页纸简介</h3>
+        <p>项目优势、课程设置、招生与学习、报名截止与咨询方式，一页看清，扫码查看更多信息。</p>
+        <div class="stats"><div><b>42</b><span>学分</span></div><div><b>63000</b><span>学费（元）</span></div><div><b>5/11</b><span>报名截止</span></div></div>
+        <div class="open">打开一页纸 →</div>
+      </a>
 
-  <div class="section">
-    <h2>📐 数学题讲解</h2>
-    <a class="feature" href="pages/math-2023bj15.html" target="_blank">
-      <div class="f-text">
-        <span class="f-tag">交互式讲解 · 可拖动参数 a · 可缩放坐标</span>
+      <a class="work" data-cat="math" data-date="2026-10-22 13:17" href="pages/math-2023bj15.html" target="_blank">
+        <div class="top"><div class="ico">📐</div><div class="cat"><b>数学讲解</b>可拖动参数 a · 可缩放坐标</div></div>
         <h3>2023 北京卷第 15 题 · 分段函数四个结论</h3>
-        <p>拖动滑块看图像随 a 变化，逐条分析单调性、最大值、距离与最小值问题，看清每个结论为什么对或错。</p>
-        <span class="f-btn">打开讲解 →</span>
-      </div>
-      <div class="f-side">
-        <div><b>②③</b><span>正确结论</span></div>
-        <div><b>4</b><span>个结论</span></div>
-        <div><b>5分</b><span>填空题</span></div>
-      </div>
-    </a>
-    <a class="feature" href="pages/math-2023bj15-showcase.html" target="_blank" style="margin-top:14px">
-      <div class="f-text">
-        <span class="f-tag">对话动态回放 · 输入 → 产出 一屏看完</span>
-        <h3>一张截图 + 一句话，做出交互式数学讲解</h3>
-        <p>动态回放真实对话：只发一张题目截图、说一句「做一个 html 网页来说明这道题」，右侧同步出现产出的讲解网页，可直接操作。</p>
-        <span class="f-btn">看完整过程 →</span>
-      </div>
-      <div class="f-side">
-        <div><b>1句</b><span>输入指令</span></div>
-        <div><b>≈26秒</b><span>耗时</span></div>
-        <div><b>$1.25</b><span>花费</span></div>
-      </div>
-    </a>
-  </div>
+        <p>拖动滑块看图像随 a 变化，逐条分析单调性、最大值、距离与最小值，看清每个结论为什么对或错。</p>
+        <div class="stats"><div><b>②③</b><span>正确结论</span></div><div><b>4</b><span>个结论</span></div><div><b>5 分</b><span>填空题</span></div></div>
+        <div class="open">打开讲解 →</div>
+      </a>
 
-  <div class="section">
-    <h2>常用工具</h2>
-    <div class="grid">
-      <a class="card" href="https://www.baidu.com" target="_blank"><span class="ico">🔍</span>百度</a>
-      <a class="card" href="https://www.bing.com" target="_blank"><span class="ico">🅱️</span>Bing</a>
-      <a class="card" href="https://www.google.com" target="_blank"><span class="ico">🌐</span>Google</a>
-      <a class="card" href="https://mail.qq.com" target="_blank"><span class="ico">📧</span>QQ邮箱</a>
-      <a class="card" href="https://www.zhihu.com" target="_blank"><span class="ico">📚</span>知乎</a>
-      <a class="card" href="https://www.bilibili.com" target="_blank"><span class="ico">📺</span>哔哩哔哩</a>
+      <a class="work" data-cat="math" data-date="2026-10-22 13:45" href="pages/math-2023bj15-showcase.html" target="_blank">
+        <div class="top"><div class="ico">🎬</div><div class="cat"><b>数学讲解 · 制作过程</b>对话动态回放</div></div>
+        <h3>一张截图 + 一句话，做出交互式讲解</h3>
+        <p>回放真实对话：发一张题目截图、说一句「做一个 html 网页来说明这道题」，右侧同步出现产出的网页，可直接操作。</p>
+        <div class="stats"><div><b>1 句</b><span>输入指令</span></div><div><b>≈26 秒</b><span>耗时</span></div><div><b>$1.25</b><span>花费</span></div></div>
+        <div class="open">看完整过程 →</div>
+      </a>
+
+    </div>
+    <div class="empty" id="empty">没有匹配的作品，按回车可以用 Bing 搜索网络</div>
+  </section>
+
+  <div class="links-bar" id="linksBar">
+    <h2>常用网站 <small id="syncState">默认列表</small></h2>
+    <div class="bar-btns">
+      <button class="btn ghost hide" id="addGroupBtn">＋ 新分组</button>
+      <button class="btn" id="editBtn">✏️ 编辑</button>
+      <button class="btn ghost hide" id="logoutBtn">退出登录</button>
     </div>
   </div>
-
-  <div class="section">
-    <h2>开发与学习</h2>
-    <div class="grid">
-      <a class="card" href="https://github.com" target="_blank"><span class="ico">🐙</span>GitHub</a>
-      <a class="card" href="https://stackoverflow.com" target="_blank"><span class="ico">💡</span>Stack Overflow</a>
-      <a class="card" href="https://developer.mozilla.org" target="_blank"><span class="ico">📖</span>MDN 文档</a>
-      <a class="card" href="https://www.runoob.com" target="_blank"><span class="ico">🐣</span>菜鸟教程</a>
-      <a class="card" href="https://chat.openai.com" target="_blank"><span class="ico">🤖</span>ChatGPT</a>
-      <a class="card" href="https://www.deepseek.com" target="_blank"><span class="ico">🐋</span>DeepSeek</a>
+  <section class="links" id="links" data-cat="links">
+    <div class="group">
+      <h4>常用工具</h4>
+      <div class="list">
+        <a class="site" href="https://www.baidu.com" target="_blank">🔍 百度</a>
+        <a class="site" href="https://www.bing.com" target="_blank">🅱️ Bing</a>
+        <a class="site" href="https://www.google.com" target="_blank">🌐 Google</a>
+        <a class="site" href="https://mail.qq.com" target="_blank">📧 QQ邮箱</a>
+        <a class="site" href="https://www.zhihu.com" target="_blank">📚 知乎</a>
+        <a class="site" href="https://www.bilibili.com" target="_blank">📺 哔哩哔哩</a>
+      </div>
     </div>
-  </div>
-
-  <div class="section">
-    <h2>购物与生活</h2>
-    <div class="grid">
-      <a class="card" href="https://www.taobao.com" target="_blank"><span class="ico">🛒</span>淘宝</a>
-      <a class="card" href="https://www.jd.com" target="_blank"><span class="ico">📦</span>京东</a>
-      <a class="card" href="https://www.dianping.com" target="_blank"><span class="ico">🍜</span>大众点评</a>
-      <a class="card" href="https://www.12306.cn" target="_blank"><span class="ico">🚄</span>12306</a>
-      <a class="card" href="https://www.amap.com" target="_blank"><span class="ico">🗺️</span>高德地图</a>
-      <a class="card" href="https://www.douyin.com" target="_blank"><span class="ico">🎵</span>抖音</a>
+    <div class="group">
+      <h4>开发与学习</h4>
+      <div class="list">
+        <a class="site" href="https://github.com" target="_blank">🐙 GitHub</a>
+        <a class="site" href="https://stackoverflow.com" target="_blank">💡 Stack Overflow</a>
+        <a class="site" href="https://developer.mozilla.org" target="_blank">📖 MDN 文档</a>
+        <a class="site" href="https://www.runoob.com" target="_blank">🐣 菜鸟教程</a>
+        <a class="site" href="https://chat.openai.com" target="_blank">🤖 ChatGPT</a>
+        <a class="site" href="https://www.deepseek.com" target="_blank">🐋 DeepSeek</a>
+      </div>
     </div>
-  </div>
+    <div class="group">
+      <h4>购物与生活</h4>
+      <div class="list">
+        <a class="site" href="https://www.taobao.com" target="_blank">🛒 淘宝</a>
+        <a class="site" href="https://www.jd.com" target="_blank">📦 京东</a>
+        <a class="site" href="https://www.dianping.com" target="_blank">🍜 大众点评</a>
+        <a class="site" href="https://www.12306.cn" target="_blank">🚄 12306</a>
+        <a class="site" href="https://www.amap.com" target="_blank">🗺️ 高德地图</a>
+        <a class="site" href="https://www.douyin.com" target="_blank">🎵 抖音</a>
+      </div>
+    </div>
+  </section>
 
-  <div class="footer">© 2026 我的导航站 · Powered by GitHub Pages</div>
+  <footer>© 2026 kpmei · Powered by GitHub Pages</footer>
+</div>
+
+<!-- 编辑 / 登录弹窗 -->
+<div class="mask hide" id="mask">
+  <form class="dlg" id="dlg">
+    <h3 id="dlgTitle">添加网站</h3>
+    <div id="dlgBody"></div>
+    <p class="dlg-msg" id="dlgMsg" role="status"></p>
+    <div class="dlg-btns">
+      <button type="button" class="btn danger hide" id="dlgDel">删除</button>
+      <span style="flex:1"></span>
+      <button type="button" class="btn ghost" id="dlgCancel">取消</button>
+      <button type="submit" class="btn" id="dlgOk">保存</button>
+    </div>
+  </form>
+</div>
+
+<script>
+  const q = document.getElementById('q');
+  /* 作品按 data-date 新→旧排序，并在卡片右上角显示日期；最新一个加「最新」标 */
+  const works = [...document.querySelectorAll('.work')]
+    .sort((a, b) => (b.dataset.date || '').localeCompare(a.dataset.date || ''));
+  const box = document.getElementById('works');
+  works.forEach((w, i) => {
+    box.appendChild(w);
+    const top = w.querySelector('.top');
+    if (i === 0) top.insertAdjacentHTML('beforeend', '<span class="new">最新</span>');
+    const d = (w.dataset.date || '').slice(5, 10).replace('-', '/');
+    if (d) top.insertAdjacentHTML('beforeend', `<span class="date">${d}</span>`);
+  });
+  const worksSec = document.getElementById('worksSec');
+  const linksSec = document.getElementById('links');
+  const hint = document.getElementById('hint');
+  let filter = 'all';
+  let editing = false;
+
+  // 分类按钮上显示数量（常用网站数量会随数据库更新）
+  function updateCounts() {
+    document.querySelectorAll('.chip').forEach(c => {
+      const f = c.dataset.f;
+      const n = f === 'all' ? works.length : f === 'links' ? document.querySelectorAll('.site:not(.add-site)').length
+              : works.filter(w => w.dataset.cat === f).length;
+      let s = c.querySelector('.n');
+      if (!s) { s = document.createElement('span'); s.className = 'n'; c.appendChild(s); }
+      s.textContent = n;
+    });
+  }
+  updateCounts();
+  document.querySelectorAll('.chip').forEach(c => {
+    const f = c.dataset.f;
+    c.onclick = () => {
+      filter = f;
+      document.querySelectorAll('.chip').forEach(x => x.classList.toggle('on', x === c));
+      render();
+    };
+  });
+
+  function render() {
+    const kw = q.value.trim().toLowerCase();
+    let shown = 0;
+    works.forEach(w => {
+      const ok = (filter === 'all' || w.dataset.cat === filter) && (!kw || w.textContent.toLowerCase().includes(kw));
+      w.classList.toggle('hide', !ok);
+      if (ok) shown++;
+    });
+    worksSec.classList.toggle('hide', filter === 'links');
+    document.getElementById('empty').style.display = shown || filter === 'links' ? 'none' : 'block';
+    document.getElementById('wcount').textContent = `${shown} 个`;
+
+    let siteShown = 0;
+    document.querySelectorAll('.group').forEach(g => {
+      let n = 0;
+      g.querySelectorAll('.site:not(.add-site)').forEach(s => {
+        const ok = !kw || s.textContent.toLowerCase().includes(kw) || s.href.includes(kw);
+        s.classList.toggle('hide', !ok); if (ok) n++;
+      });
+      g.classList.toggle('hide', n === 0); siteShown += n;
+    });
+    const showLinks = (filter === 'all' || filter === 'links') && (siteShown > 0 || editing);
+    linksSec.classList.toggle('hide', !showLinks);
+    document.getElementById('linksBar').classList.toggle('hide', !showLinks);
+
+    hint.textContent = kw ? `找到 ${shown} 个作品、${siteShown} 个网站 · 回车在 Bing 搜索「${q.value.trim()}」` : '';
+  }
+
+  q.addEventListener('input', render);
+  document.getElementById('sf').onsubmit = e => {
+    e.preventDefault();
+    const v = q.value.trim();
+    if (v) window.open('https://www.bing.com/search?q=' + encodeURIComponent(v), '_blank');
+  };
+  // 按 / 快速聚焦搜索框，Esc 清空
+  document.addEventListener('keydown', e => {
+    if (e.key === '/' && document.activeElement !== q) { e.preventDefault(); q.focus(); }
+    if (e.key === 'Escape') { q.value = ''; render(); q.blur(); }
+  });
+  render();
+</script>
+
+<!-- 常用网站：从 Supabase 读取；只有站长邮箱登录后可编辑（权限由数据库 RLS 规则保证） -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.118.0/dist/umd/supabase.js"></script>
+<script>
+(() => {
+  const SB_URL = 'https://plmbqvwjlaotdeewxazj.supabase.co';
+  const SB_KEY = 'sb_publishable_XMtqHHPPlXEB_sYanwO4xQ_uRCaijQH'; /* 公开密钥，可以放在网页里 */
+  const OWNER = 'meikp666@gmail.com';
+
+  const $ = id => document.getElementById(id);
+  const syncState = $('syncState');
+  if (!window.supabase) { syncState.textContent = '默认列表（未连上数据库）'; $('editBtn').classList.add('hide'); return; }
+  const sb = window.supabase.createClient(SB_URL, SB_KEY);
+
+  let rows = [];       /* 数据库里的网站 */
+  let user = null;     /* 当前登录用户 */
+  const esc = s => String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+  const isOwner = () => user && (user.email || '').toLowerCase() === OWNER;
+
+  /* ---------- 显示 ---------- */
+  function draw() {
+    const groups = [];
+    rows.forEach(r => { let g = groups.find(x => x.name === r.grp); if (!g) groups.push(g = { name: r.grp, items: [] }); g.items.push(r); });
+    linksSec.innerHTML = groups.map(g => `
+      <div class="group">
+        <h4>${esc(g.name)}<span class="ren" data-ren="${esc(g.name)}" title="改分组名">改名</span></h4>
+        <div class="list">
+          ${g.items.map(r => `<a class="site" href="${esc(r.url)}" target="_blank" rel="noopener" data-id="${r.id}">${esc(r.icon)} ${esc(r.name)}<span class="ed">✏️</span></a>`).join('')}
+          <a class="site add-site" href="#" data-add="${esc(g.name)}">＋ 添加</a>
+        </div>
+      </div>`).join('');
+    updateCounts(); render();
+  }
+
+  async function load() {
+    const { data, error } = await sb.from('nav_links').select('*').order('sort').order('id');
+    if (error) { syncState.textContent = '默认列表（数据库读取失败）'; console.warn(error); return false; }
+    rows = data; draw();
+    syncState.textContent = '云端同步 · ' + rows.length + ' 个';
+    return true;
+  }
+
+  /* ---------- 编辑模式 ---------- */
+  function setEditing(on) {
+    editing = on;
+    linksSec.classList.toggle('editing', on);
+    $('editBtn').textContent = on ? '✅ 完成' : '✏️ 编辑';
+    $('addGroupBtn').classList.toggle('hide', !on);
+    $('logoutBtn').classList.toggle('hide', !user);
+    render();
+  }
+
+  $('editBtn').onclick = () => {
+    if (editing) return setEditing(false);
+    if (isOwner()) return setEditing(true);
+    openLogin();
+  };
+  $('logoutBtn').onclick = async () => { await sb.auth.signOut(); user = null; setEditing(false); };
+  $('addGroupBtn').onclick = () => openSite(null, '');
+
+  linksSec.addEventListener('click', e => {
+    if (!editing) return;
+    const ren = e.target.closest('[data-ren]');
+    const add = e.target.closest('[data-add]');
+    const site = e.target.closest('.site[data-id]');
+    if (ren) { e.preventDefault(); return openRename(ren.dataset.ren); }
+    if (add) { e.preventDefault(); return openSite(null, add.dataset.add); }
+    if (site) { e.preventDefault(); return openSite(rows.find(r => r.id == site.dataset.id)); }
+  });
+
+  /* ---------- 弹窗 ---------- */
+  const mask = $('mask'), dlg = $('dlg'), msg = $('dlgMsg');
+  let onOk = null, onDel = null;
+  function openDlg(title, html, okText, ok, del) {
+    $('dlgTitle').textContent = title; $('dlgBody').innerHTML = html;
+    $('dlgOk').textContent = okText; $('dlgOk').disabled = false;
+    $('dlgDel').classList.toggle('hide', !del);
+    msg.textContent = ''; msg.className = 'dlg-msg';
+    onOk = ok; onDel = del;
+    mask.classList.remove('hide');
+    const f = dlg.querySelector('input'); if (f) f.focus();
+  }
+  const closeDlg = () => mask.classList.add('hide');
+  const say = (t, err) => { msg.textContent = t; msg.className = 'dlg-msg' + (err ? ' err' : ''); };
+  $('dlgCancel').onclick = closeDlg;
+  mask.addEventListener('click', e => { if (e.target === mask) closeDlg(); });
+  document.addEventListener('keydown', e => { if (e.key === 'Escape') closeDlg(); });
+  dlg.onsubmit = async e => {
+    e.preventDefault(); if (!onOk) return;
+    $('dlgOk').disabled = true;
+    try { await onOk(); } catch (err) { say(err.message || String(err), true); }
+    $('dlgOk').disabled = false;
+  };
+  $('dlgDel').onclick = async () => { if (onDel && confirm('确定删除？')) { try { await onDel(); } catch (err) { say(err.message, true); } } };
+  const val = id => $(id).value.trim();
+  const check = ({ error }) => { if (error) throw new Error('保存失败：' + error.message); };
+
+  function openLogin() {
+    openDlg('登录后编辑', `
+      <label for="fEmail">邮箱（只有站长邮箱可以编辑）</label>
+      <input id="fEmail" type="email" required autocomplete="email" value="${OWNER}">`,
+      '发送登录链接', async () => {
+        const email = val('fEmail').toLowerCase();
+        if (email !== OWNER) return say('这个邮箱没有编辑权限', true);
+        const { error } = await sb.auth.signInWithOtp({ email, options: { emailRedirectTo: location.origin + location.pathname } });
+        if (error) return say('发送失败：' + error.message, true);
+        say('已发送！去邮箱点「Log In」链接，会自动回到本页并登录。');
+      });
+  }
+
+  function groupOptions(cur) {
+    const names = [...new Set(rows.map(r => r.grp))];
+    return names.map(n => `<option ${n === cur ? 'selected' : ''}>${esc(n)}</option>`).join('') + '<option value="__new">＋ 新分组…</option>';
+  }
+
+  function openSite(r, grp) {
+    const isNew = !r; const g = r ? r.grp : grp;
+    openDlg(isNew ? '添加网站' : '修改网站', `
+      <label for="fName">名称</label><input id="fName" required maxlength="30" value="${r ? esc(r.name) : ''}">
+      <label for="fUrl">网址</label><input id="fUrl" required placeholder="https://" value="${r ? esc(r.url) : ''}">
+      <label for="fIcon">图标（一个 emoji，可不填）</label><input id="fIcon" maxlength="8" value="${r ? esc(r.icon) : ''}">
+      <label for="fGrp">分组</label><select id="fGrp">${groupOptions(g || '__new')}</select>
+      <input id="fNewGrp" class="${g ? 'hide' : ''}" placeholder="新分组名" maxlength="20" style="margin-top:6px">`,
+      '保存', async () => {
+        let url = val('fUrl'); if (!/^https?:\/\//i.test(url)) url = 'https://' + url;
+        const grpName = $('fGrp').value === '__new' ? val('fNewGrp') : $('fGrp').value;
+        if (!grpName) return say('请填分组名', true);
+        const data = { name: val('fName'), url, icon: val('fIcon') || '🔗', grp: grpName };
+        if (isNew) {
+          const max = Math.max(0, ...rows.filter(x => x.grp === grpName).map(x => x.sort), ...(rows.some(x => x.grp === grpName) ? [] : rows.map(x => x.sort)));
+          data.sort = max + 10;
+          check(await sb.from('nav_links').insert(data));
+        } else {
+          check(await sb.from('nav_links').update(data).eq('id', r.id));
+        }
+        closeDlg(); await load();
+      },
+      isNew ? null : async () => { check(await sb.from('nav_links').delete().eq('id', r.id)); closeDlg(); await load(); });
+    $('fGrp').onchange = () => $('fNewGrp').classList.toggle('hide', $('fGrp').value !== '__new');
+    if (!g) setTimeout(() => $('fName').focus());
+  }
+
+  function openRename(old) {
+    openDlg('改分组名', `<label for="fG">分组名</label><input id="fG" required maxlength="20" value="${esc(old)}">`,
+      '保存', async () => {
+        check(await sb.from('nav_links').update({ grp: val('fG') }).eq('grp', old));
+        closeDlg(); await load();
+      });
+  }
+
+  /* ---------- 启动 ---------- */
+  sb.auth.onAuthStateChange((_e, session) => {
+    user = session ? session.user : null;
+    $('logoutBtn').classList.toggle('hide', !user);
+    if (user && !isOwner()) syncState.textContent += '（当前账号无编辑权限）';
+  });
+  load();
+})();
+</script>
 </body>
 </html>
