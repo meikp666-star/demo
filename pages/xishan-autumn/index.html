@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>西山秋日探险记 · 蝴蝶与种子的秘密</title>
+<link rel="stylesheet" href="css/styles.css?v=2">
+</head>
+<body>
+<!-- 顶部徽章进度 -->
+<header class="topbar" aria-label="探险进度">
+  <div class="brand"><svg viewBox="0 0 40 40" class="i"><use href="#leaf"/></svg>西山秋日探险记</div>
+  <div class="progress-wrap">
+    <span class="plabel">博物学家徽章 <b id="badgeCount">0</b>/<span id="badgeTotal">9</span></span>
+    <div class="pbar"><div id="pfill"></div></div>
+  </div>
+  <button id="motionBtn" class="chip" aria-pressed="false">暂停动画</button>
+</header>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs>
+    <symbol id="leaf" viewBox="0 0 40 40"><path d="M20 2C8 10 4 22 10 32c4 6 12 6 16 2 8-8 8-20-6-32z" fill="currentColor"/><path d="M20 4c-2 10-4 20-10 30" stroke="#fff6" stroke-width="1.6" fill="none"/></symbol>
+    <symbol id="maple" viewBox="0 0 40 40"><path d="M20 2l3 9 6-4-1 8 8-1-5 6 6 3-8 3 2 7-7-4-4 9-4-9-7 4 2-7-8-3 6-3-5-6 8 1-1-8 6 4z" fill="currentColor"/></symbol>
+    <symbol id="bfly" viewBox="0 0 60 44"><g class="wl"><path d="M30 22C22 4 6 0 3 8s6 16 27 14z" fill="currentColor"/><path d="M30 24C16 26 6 34 10 40s16 0 20-16z" fill="currentColor" opacity=".8"/></g><g class="wr"><path d="M30 22C38 4 54 0 57 8s-6 16-27 14z" fill="currentColor"/><path d="M30 24c14 2 24 10 20 16s-16 0-20-16z" fill="currentColor" opacity=".8"/></g><rect x="28.6" y="12" width="2.8" height="22" rx="1.4" fill="#4a3020"/><path d="M29 13c-2-5-5-8-7-9M31 13c2-5 5-8 7-9" stroke="#4a3020" stroke-width="1.2" fill="none"/></symbol>
+  </defs>
+</svg>
+
+<main>
+<!-- HERO -->
+<section class="hero" id="hero">
+  <div class="sky" id="leafSky" aria-hidden="true"></div>
+  <div class="hero-text">
+    <p class="tag">秋天的森林寄来一封邀请信</p>
+    <h1>和蝴蝶、橡子、<br>会飞的种子<br><span>一起过秋天</span></h1>
+    <p class="lead">翅膀为什么会发光？松果是不是果子？哪种“板栗”千万不能吃？跟着依依的地图，完成 9 个小任务，领取你的<b>小小博物学家</b>证书！</p>
+    <div class="hero-actions">
+      <a class="btn primary" href="#butterfly">出发去看蝴蝶</a>
+      <a class="btn ghost" href="#plant">先去捡秋</a>
+    </div>
+    <p class="catch">小提示：点一点飘下来的叶子，你已经接住了 <b id="leafCount">0</b> 片秋叶</p>
+  </div>
+  <div class="hero-pic">
+    <img src="assets/images/dome-green.webp" alt="玻璃罩里的绿带翠凤蝶生态标本" width="900" height="900">
+    <div class="stamp">10.24<small>周六</small></div>
+  </div>
+</section>
+
+<!-- 地图导航 -->
+<nav class="map" aria-label="探险地图">
+  <a href="#butterfly" class="stop s1"><i>1</i>蝴蝶的秘密</a>
+  <a href="#craft" class="stop s2"><i>2</i>亲手做标本</a>
+  <a href="#plant" class="stop s3"><i>3</i>西山捡秋</a>
+  <a href="#info" class="stop s4"><i>4</i>报名出发</a>
+</nav>
+
+<!-- 第一站：蝴蝶 -->
+<section id="butterfly" class="station">
+  <div class="st-head"><span class="num">第一站</span><h2>翅膀上的光学魔法</h2><p>蝴蝶翅膀上那层“彩色粉末”，其实是成千上万片排得整整齐齐的<b>小鳞片</b>，就像屋顶上的瓦片。</p></div>
+
+  <div class="task card" data-badge="lens">
+    <div class="task-title"><span class="badge-dot"></span>任务 1：拿起放大镜</div>
+    <p>把放大镜移到蝴蝶翅膀上（手机上用手指拖动），看看“粉末”到底长什么样？</p>
+    <div class="lens-stage" id="lensStage">
+      <img src="assets/images/papilio-maackii.webp" alt="绿带翠凤蝶标本" width="900" height="733">
+      <div class="lens" id="lens" aria-hidden="true"></div>
+      <div class="lens-hint" id="lensHint">移动到这里</div>
+    </div>
+    <p class="reveal" id="lensMsg" aria-live="polite"></p>
+  </div>
+
+  <h3 class="sub">认识两位蝴蝶明星</h3>
+  <div class="stars">
+    <article class="star card">
+      <div class="flip" tabindex="0" role="button" aria-label="翻开绿带翠凤蝶卡片">
+        <div class="face front"><img src="assets/images/papilio-maackii.webp" alt="绿带翠凤蝶" width="900" height="733"><h4>绿带翠凤蝶</h4><p class="nick">外号：森林皇后</p><span class="tap">点我翻面</span></div>
+        <div class="face back"><h4>我的绿色不是颜料！</h4><p>翅膀上蓝绿色的金属光泽，是鳞片上超级微小的结构把阳光“折”出来的，叫做<b>结构色</b>。</p><p>我是北京本土蝴蝶里的颜值担当，最爱停在高高的树梢上。</p></div>
+      </div>
+    </article>
+    <article class="star card task" data-badge="color">
+      <div class="task-title"><span class="badge-dot"></span>任务 2：让大紫蛱蝶变色</div>
+      <div class="iris-wrap"><img id="irisImg" src="assets/images/apatura-iris.webp" alt="紫色蛱蝶标本" width="900" height="650"><div class="shine" id="irisShine"></div></div>
+      <label for="irisRange" class="rl">歪一歪头看它（拖动滑块换角度）</label>
+      <input type="range" id="irisRange" min="0" max="100" value="0">
+      <p class="iris-name">现在看到：<b id="irisName">华贵的深紫罗兰色</b></p>
+      <p class="small">它是蝴蝶界的“变色龙”，还是个口味独特的美食家：不爱花蜜，偏爱<b>发酵的树汁</b>。（滑块变色是模拟效果）</p>
+    </article>
+  </div>
+
+  <h3 class="sub">昆虫界的生存大智慧</h3>
+  <div class="grid2">
+    <div class="task card" data-badge="kallima">
+      <div class="task-title"><span class="badge-dot"></span>任务 3：落叶堆里找蝴蝶</div>
+      <p>一只<b>枯叶蝶</b>把自己伪装成了落叶，你能在 <b>15 秒</b>内找到它吗？</p>
+      <div class="leafpile" id="pile"></div>
+      <div class="row"><button class="btn small" id="pileStart">开始找</button><span id="pileMsg" aria-live="polite" class="msg"></span></div>
+      <figure class="hidepic" id="kallimaFig"><img src="assets/images/kallima.webp" alt="枯叶蛱蝶标本" width="900" height="1000"><figcaption>枯叶蛱蝶：合上翅膀时，翅膀背面就像一片带“叶脉”的枯叶，连天敌都会被骗过。</figcaption></figure>
+    </div>
+    <div class="task card" data-badge="owl">
+      <div class="task-title"><span class="badge-dot"></span>任务 4：大眼睛吓跑小鸟</div>
+      <p>有只饿肚子的小鸟飞来了！快帮猫头鹰环蝶亮出翅膀上的“大眼睛”。</p>
+      <div class="owl-stage" id="owlStage">
+        <img src="assets/images/owl-butterfly.webp" alt="翅膀上有大眼斑的猫头鹰环蝶" width="400" height="351" id="owlImg">
+        <svg class="bird" id="bird" viewBox="0 0 80 60" aria-hidden="true"><ellipse cx="38" cy="34" rx="22" ry="15" fill="#6b8fb3"/><circle cx="58" cy="24" r="11" fill="#6b8fb3"/><circle cx="62" cy="22" r="3" fill="#fff"/><circle cx="63" cy="22" r="1.5" fill="#333"/><path d="M68 25l9 3-9 3z" fill="#f2a33a"/><path class="bw" d="M30 30q-4-20 16-18q-2 14-16 18z" fill="#4f7397"/><path d="M16 34l-14-6 4 10z" fill="#4f7397"/></svg>
+      </div>
+      <div class="row"><button class="btn small" id="birdBtn">小鸟来啦</button><button class="btn small primary" id="eyeBtn" disabled>亮出大眼睛</button></div>
+      <p class="msg" id="owlMsg" aria-live="polite"></p>
+    </div>
+  </div>
+
+  <div class="task card" data-badge="quiz">
+    <div class="task-title"><span class="badge-dot"></span>任务 5：是蝴蝶还是蛾子？</div>
+    <div class="quiz" id="quiz"></div>
+  </div>
+
+  <div class="card life">
+    <h3 class="sub inline">蝴蝶的一生</h3>
+    <div class="life-steps" id="lifeSteps" role="tablist"></div>
+    <div class="life-show"><svg viewBox="0 0 200 120" id="lifeSvg" aria-hidden="true"></svg><p id="lifeText" aria-live="polite"></p></div>
+    <p class="fact">你知道吗？北美的帝王斑蝶每年要飞几千公里去过冬，比从北京飞到海南还远！</p>
+  </div>
+</section>
+
+<!-- 第二站：手作 -->
+<section id="craft" class="station alt">
+  <div class="st-head"><span class="num">第二站</span><h2>亲手打造秋日生态标本</h2><p>工具和材料全都准备好了，不用自己带。做完的作品可以直接抱回家！</p></div>
+  <div class="craft">
+    <div class="dome-demo">
+      <div class="dome" id="dome"><img src="assets/images/dome-book.webp" alt="木底座玻璃罩蝴蝶生态标本" width="900" height="900"><div class="glow"></div></div>
+      <button class="btn" id="lampBtn" aria-pressed="false">打开小暖灯</button>
+    </div>
+    <ol class="recipe">
+      <li><b>选一只蝴蝶</b><span>真实完整的人工养殖蝴蝶标本，绿带翠凤蝶、大紫蛱蝶等你挑。</span></li>
+      <li><b>搭一座小山林</b><span>永生花、苔藓、松果……用秋天的材料，设计只属于你的迷你森林。</span></li>
+      <li><b>盖上玻璃罩</b><span>原木底座加暖光小灯，防尘又好看，放在书桌上像一个小小博物馆。</span></li>
+    </ol>
+  </div>
+  <figure class="wide"><img src="assets/images/frame-16.webp" alt="十六宫格秋日植物标本框" width="900" height="876"><figcaption>下午的捡秋课，还能把捡到的宝贝装进这样的“格子标本框”。</figcaption></figure>
+</section>
+
+<!-- 第三站：植物 -->
+<section id="plant" class="station">
+  <div class="st-head"><span class="num">第三站</span><h2>西山捡秋 · 当个小小植物学家</h2><p>走在路上就能用的辨识秘籍，学完你就能对着地上的“宝贝”叫出它们的名字。</p></div>
+
+  <div class="task card" data-badge="box">
+    <div class="task-title"><span class="badge-dot"></span>任务 6：拆开秋天的果实盲盒</div>
+    <p>每个盒子里都有一种“果子”。全部拆开，找出那个<b>其实不是果实</b>的家伙！</p>
+    <div class="boxes" id="boxes"></div>
+    <p class="msg" id="boxMsg" aria-live="polite"></p>
+    <figure class="hidepic" id="fruitFig"><img src="assets/images/fruit-types.webp" alt="生活中常见的果实类型图" width="900" height="678"><figcaption>生活中常见的果实类型</figcaption></figure>
+  </div>
+
+  <div class="task card" data-badge="pine">
+    <div class="task-title"><span class="badge-dot"></span>任务 7：松、杉、柏三兄弟猜猜猜</div>
+    <p>看叶子的样子，猜猜它是三兄弟里的谁？</p>
+    <div class="riddles" id="riddles"></div>
+    <figure class="hidepic" id="pineFig"><img src="assets/images/pine-fir-cypress.webp" alt="松杉柏辨识技巧图" width="900" height="675"><figcaption>口诀：松树叶子扎成束，杉树叶子排两排，柏树叶子像鳞片。</figcaption></figure>
+  </div>
+
+  <div class="grid2">
+    <div class="card acorn-card">
+      <div class="task-title">戴“小帽子”的橡子</div>
+      <div class="acorn-stage" id="acornStage">
+        <svg viewBox="0 0 120 150" class="acorn" id="acorn" role="button" tabindex="0" aria-label="点一下摘掉橡子的帽子">
+          <g id="acornBody"><ellipse cx="60" cy="95" rx="32" ry="42" fill="#c98a4b"/><ellipse cx="50" cy="90" rx="8" ry="20" fill="#e0a868" opacity=".7"/><path d="M60 136l0 8" stroke="#7a4b2a" stroke-width="4" stroke-linecap="round"/></g>
+          <g id="acornCap"><path d="M22 62q38-34 76 0q4 12-6 14H28q-10-2-6-14z" fill="#7a5530"/><path d="M30 60h60M28 68h64M40 52h40" stroke="#5c3d20" stroke-width="2.4" stroke-dasharray="4 4"/><path d="M60 30v-14" stroke="#5c3d20" stroke-width="5" stroke-linecap="round"/></g>
+        </svg>
+        <p class="msg" id="acornMsg" aria-live="polite">点一点橡子，摘下它的小帽子</p>
+      </div>
+      <p class="small">橡子底部的杯状“小帽子”叫<b>壳斗</b>，所以它们的家族叫<b>壳斗科</b>。西山有栓皮栎、槲栎、槲树……每种橡子的帽子都不一样，是松鼠、花鼠过冬的“粮仓”。</p>
+      <img class="rounded" src="assets/images/acorns.webp" alt="不同种类的壳斗科果实" width="900" height="884" loading="lazy">
+    </div>
+
+    <div class="task card" data-badge="seed">
+      <div class="task-title"><span class="badge-dot"></span>任务 8：种子飞行大赛</div>
+      <p>元宝枫的种子长着一对薄薄的翅膀（<b>翅果</b>），会像迷你直升机一样转着圈飞走。点“放飞”，看看能飞多远！</p>
+      <div class="sky-arena" id="arena"><div class="tree" aria-hidden="true"></div><div class="ruler" id="ruler"></div></div>
+      <div class="row"><button class="btn small primary" id="flyBtn">放飞一颗翅果</button><label class="wind">风力 <input type="range" id="wind" min="0" max="10" value="5"></label></div>
+      <p class="msg" id="flyMsg" aria-live="polite">准备好了吗？风越大，飞得越远</p>
+      <details><summary>看看还有哪些会“飞”的种子</summary><img class="rounded" src="assets/images/samaras.webp" alt="不同类型的翅果" width="900" height="1188" loading="lazy"></details>
+    </div>
+  </div>
+
+  <div class="task card danger" data-badge="safe">
+    <div class="task-title"><span class="badge-dot"></span>任务 9：安全小卫士</div>
+    <div class="safe">
+      <img src="assets/images/aesculus.webp" alt="七叶树的果实和种子" width="900" height="1175">
+      <div>
+        <p class="q">林子里捡到一颗圆滚滚、棕褐色、长得很像板栗的果子，<b>能吃吗？</b></p>
+        <div class="row"><button class="btn small" data-safe="eat">好像是板栗，尝一口</button><button class="btn small primary" data-safe="no">不认识，绝对不吃</button></div>
+        <div class="safe-ans" id="safeAns" aria-live="polite"></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 第四站：报名 -->
+<section id="info" class="station alt">
+  <div class="st-head"><span class="num">第四站</span><h2>带上大人，一起出发</h2></div>
+  <div class="teacher card">
+    <img src="assets/images/teacher.webp" alt="手捧大蚕蛾的自然老师" width="900" height="931" loading="lazy">
+    <div>
+      <h3>果果老师</h3>
+      <ul class="tlist"><li>北京林业大学 动物学硕士</li><li>资深自然教育讲师，教博物学八年</li><li>最会用小朋友听得懂的话，回答每一个“为什么”</li></ul>
+      <p class="quote">“热爱自然的人，对生活总是怀有敬意。”</p>
+    </div>
+  </div>
+
+  <div class="countdown card"><span>距离出发还有</span><b id="cd">--</b></div>
+
+  <div class="timeline">
+    <div class="tl card"><time>13:30 - 14:30</time><h4>蝴蝶科普与生态标本课</h4><ul><li>博物小课堂：蝴蝶和蛾子的区别、蝴蝶的一生、迁徙与拟态</li><li>手作时光：生态标本创作</li><li>作品展示、合影，成品带走</li></ul></div>
+    <div class="tl card"><time>15:00 - 16:00</time><h4>西山捡秋 · 自然标本课</h4><ul><li>博物小课堂：果实类型、松杉柏、壳斗科、会飞的种子、有毒植物</li><li>林间捡秋：营地步道捡自然掉落物</li><li>手作时光：布置专属格子秋日标本</li></ul></div>
+  </div>
+
+  <dl class="facts card">
+    <div><dt>时间</dt><dd>2026 年 10 月 24 日（周六）</dd></div>
+    <div><dt>地点</dt><dd>北京西山国家森林公园 · 拾光营地</dd></div>
+    <div><dt>价格</dt><dd>168 元 / 组（建议 1 大 1 小）</dd></div>
+    <div><dt>适合</dt><dd>5 岁及以上、爱自然爱手工的亲子家庭</dd></div>
+  </dl>
+
+  <div class="signup card">
+    <img src="assets/images/qrcode.webp" alt="报名咨询微信二维码：点点 · 西山拾光营地" width="820" height="1219" loading="lazy">
+    <div><h3>扫码咨询报名</h3><p>微信添加「点点 | 西山拾光营地」</p><p class="small">名额有限，先到先得。北京的秋天走得很快，别错过这一季！</p></div>
+  </div>
+</section>
+</main>
+
+<!-- 证书 -->
+<div class="cert" id="cert" role="dialog" aria-modal="true" aria-labelledby="certTitle" hidden>
+  <div class="cert-in">
+    <svg viewBox="0 0 60 44" class="cert-b"><use href="#bfly"/></svg>
+    <h2 id="certTitle">小小博物学家证书</h2>
+    <label for="kidName">写下你的名字：</label>
+    <input id="kidName" maxlength="12" placeholder="你的名字">
+    <p class="cert-text">恭喜 <b id="certName">小探险家</b> 完成全部 9 个西山秋日任务！你已经认识了结构色、拟态、壳斗和翅果，还记住了“不认识的果子不吃”。</p>
+    <button class="btn primary" id="certClose">收下证书</button>
+  </div>
+</div>
+<footer>内容整理自「西山拾光营地」秋日活动推文 · 页面由依依改编制作</footer>
+<script src="js/main.js?v=2"></script>
+</body>
+</html>
