@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>一篇推文的三次变身 · 西山秋日探险记</title>
+<style>
+  * { box-sizing: border-box; }
+  body { margin: 0; font-family: -apple-system, "PingFang SC", "Microsoft YaHei", sans-serif; background: #f6f1e7; color: #2b2b2b; }
+  a { color: inherit; }
+  header { background: linear-gradient(120deg, #1f5a43, #2f7356 55%, #c8642f); color: #fff; padding: 34px 20px 30px; text-align: center; }
+  header .kicker { font-size: 13px; letter-spacing: .2em; opacity: .85; }
+  header h1 { margin: 10px 0 8px; font-size: 30px; }
+  header p { margin: 0 auto; max-width: 720px; font-size: 15px; line-height: 1.8; opacity: .92; }
+  .back { position: absolute; left: 16px; top: 14px; font-size: 13px; color: #fff; opacity: .85; text-decoration: none; }
+
+  /* 流程条 */
+  .flow { max-width: 1200px; margin: -18px auto 0; padding: 0 16px; display: grid; grid-template-columns: 1fr auto 1fr auto 1fr; gap: 10px; align-items: stretch; }
+  .step { background: #fff; border-radius: 16px; padding: 16px 18px; box-shadow: 0 4px 16px rgba(60,40,10,.08); cursor: pointer; border: 2px solid transparent; transition: .2s; }
+  .step:hover { transform: translateY(-2px); }
+  .step.on { border-color: var(--c); }
+  .step .no { display: inline-block; font-size: 12px; font-weight: 700; color: #fff; background: var(--c); border-radius: 99px; padding: 2px 10px; }
+  .step h3 { margin: 8px 0 4px; font-size: 17px; }
+  .step .who { font-size: 12px; color: #8a7a66; }
+  .step p { margin: 8px 0 10px; font-size: 13.5px; line-height: 1.7; color: #555; }
+  .step .nums { display: flex; gap: 14px; }
+  .step .nums div { text-align: center; }
+  .step .nums b { display: block; font-size: 18px; color: var(--c); }
+  .step .nums span { font-size: 11px; color: #999; }
+  .arrow { display: flex; flex-direction: column; justify-content: center; align-items: center; color: #b08a5a; font-size: 12px; width: 70px; text-align: center; line-height: 1.5; }
+  .arrow i { font-style: normal; font-size: 26px; }
+
+  /* 手机预览 */
+  .tabs { display: none; justify-content: center; gap: 8px; margin: 22px 0 0; }
+  .tabs button { border: 0; background: #fff; border-radius: 99px; padding: 7px 14px; font-size: 13px; cursor: pointer; color: #555; box-shadow: 0 1px 4px rgba(0,0,0,.08); }
+  .tabs button.on { background: #1f5a43; color: #fff; }
+  .phones { max-width: 1200px; margin: 26px auto 0; padding: 0 16px; display: grid; grid-template-columns: repeat(3, 1fr); gap: 22px; }
+  .phone { display: flex; flex-direction: column; align-items: center; }
+  .phone .cap { font-size: 14px; font-weight: 600; margin-bottom: 10px; display: flex; gap: 8px; align-items: center; }
+  .phone .cap a { font-size: 12px; font-weight: 400; color: #2f7356; }
+  .frame { width: 100%; max-width: 380px; height: 720px; border-radius: 34px; background: #1d1d1f; padding: 12px; box-shadow: 0 14px 34px rgba(0,0,0,.18); position: relative; }
+  .frame::before { content: ""; position: absolute; top: 18px; left: 50%; transform: translateX(-50%); width: 80px; height: 6px; border-radius: 6px; background: #3a3a3c; z-index: 2; }
+  .frame iframe { width: 100%; height: 100%; border: 0; border-radius: 24px; background: #fff; }
+  .phone .tip { font-size: 12px; color: #8a7a66; margin-top: 10px; text-align: center; line-height: 1.6; max-width: 360px; }
+
+  /* 说明 */
+  .notes { max-width: 1200px; margin: 40px auto 0; padding: 0 16px; display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; }
+  .note { background: #fff; border-radius: 16px; padding: 18px 20px; box-shadow: 0 2px 10px rgba(60,40,10,.06); }
+  .note h4 { margin: 0 0 8px; font-size: 15px; }
+  .note ul { margin: 0; padding-left: 18px; font-size: 13.5px; line-height: 1.9; color: #555; }
+  footer { text-align: center; font-size: 12px; color: #a09484; padding: 36px 16px 40px; line-height: 1.8; }
+
+  @media (max-width: 1100px) {
+    .flow { grid-template-columns: 1fr; }
+    .arrow { width: auto; flex-direction: row; gap: 8px; }
+    .arrow i { transform: rotate(90deg); }
+    .tabs { display: flex; }
+    .phones { grid-template-columns: 1fr; }
+    .phone { display: none; }
+    .phone.on { display: flex; }
+    .notes { grid-template-columns: 1fr; }
+  }
+  @media (max-width: 480px) {
+    header h1 { font-size: 24px; }
+    .frame { height: 640px; border-radius: 28px; padding: 9px; }
+  }
+</style>
+</head>
+<body>
+<header>
+  <a class="back" href="../../index.html">← 返回作品集</a>
+  <div class="kicker">MAKING-OF · 制作过程</div>
+  <h1>🍁 一篇推文的三次变身</h1>
+  <p>从一篇普通的活动推文出发，先让 Opus 5.5 改成给孩子玩的互动网页，再以网页为蓝本，做回一篇能在微信里点着玩的 SVG 互动推送。三个版本都放在下面，可以直接在手机框里滑动、点击。</p>
+</header>
+
+<section class="flow">
+  <div class="step on" data-i="0" style="--c:#7a6a58">
+    <span class="no">① 原始推送</span>
+    <h3>秋日限定遛娃指南</h3>
+    <div class="who">北京西山国家森林公园 · 公众号原文</div>
+    <p>传统图文：活动介绍、知识点、图片和报名信息，从上往下读。</p>
+    <div class="nums"><div><b>32</b><span>张图片</span></div><div><b>0</b><span>个互动</span></div><div><b>读</b><span>主要方式</span></div></div>
+  </div>
+  <div class="arrow"><i>➜</i>Opus 5.5<br>改写成网页</div>
+  <div class="step" data-i="1" style="--c:#2f7356">
+    <span class="no">② 互动网页</span>
+    <h3>西山秋日探险记</h3>
+    <div class="who">Opus 5.5 生成 · 2026-10-22</div>
+    <p>改写给孩子：探险地图、放大镜看鳞片、落叶堆找枯叶蝶、拆果实盲盒，集徽章领证书。</p>
+    <div class="nums"><div><b>9</b><span>个互动任务</span></div><div><b>4</b><span>站地图</span></div><div><b>玩</b><span>主要方式</span></div></div>
+  </div>
+  <div class="arrow"><i>➜</i>在网页基础上<br>改回推送</div>
+  <div class="step" data-i="2" style="--c:#c8642f">
+    <span class="no">③ 互动推送 v4</span>
+    <h3>西山秋日探险记 · 推送版</h3>
+    <div class="who">以网页为蓝本 · 2026-10-25</div>
+    <p>微信正文不能运行脚本，网页里的玩法全部改用 SVG 点击动画重做，粘贴进公众号编辑器就能用。</p>
+    <div class="nums"><div><b>21</b><span>张互动 SVG</span></div><div><b>116</b><span>个点击动画</span></div><div><b>9</b><span>个任务</span></div></div>
+  </div>
+</section>
+
+<div class="tabs" id="tabs">
+  <button class="on" data-i="0">① 原始推送</button>
+  <button data-i="1">② 互动网页</button>
+  <button data-i="2">③ 互动推送</button>
+</div>
+
+<section class="phones">
+  <div class="phone on">
+    <div class="cap">① 原始推送 <a href="https://mp.weixin.qq.com/s/OtRSO7sjA3L6APs3ojgtWw" target="_blank">看微信原文 ↗</a></div>
+    <div class="frame"><iframe src="original.html" title="原始推送" loading="lazy"></iframe></div>
+    <div class="tip">本地存档（图片已压缩），排版与原文一致</div>
+  </div>
+  <div class="phone">
+    <div class="cap">② 互动网页 <a href="../xishan-autumn/index.html" target="_blank">全屏打开 ↗</a></div>
+    <div class="frame"><iframe src="../xishan-autumn/index.html" title="互动网页" loading="lazy"></iframe></div>
+    <div class="tip">点地图、拖放大镜、翻落叶……完成任务可集徽章</div>
+  </div>
+  <div class="phone">
+    <div class="cap">③ 互动推送 v4 <a href="push-v4.html" target="_blank">全屏打开 ↗</a></div>
+    <div class="frame"><iframe src="push-v4.html" title="互动推送" loading="lazy"></iframe></div>
+    <div class="tip">看到 👆 就点一点；效果与在微信里打开一致</div>
+  </div>
+</section>
+
+<section class="notes">
+  <div class="note">
+    <h4>📄 → 🌐 推文变网页</h4>
+    <ul>
+      <li>读者从「家长」换成「孩子」，语气改成闯关口吻</li>
+      <li>知识点拆成 4 站地图、9 个小任务</li>
+      <li>用 JS 做拖拽、计分、徽章和证书</li>
+    </ul>
+  </div>
+  <div class="note">
+    <h4>🌐 → 📱 网页变推送</h4>
+    <ul>
+      <li>公众号正文不允许 script 和 CSS 交互</li>
+      <li>改用 SVG 动画 + 「点击触发」实现翻牌、换色、找蝴蝶</li>
+      <li>图片上传到微信素材库，粘贴代码即可发布</li>
+    </ul>
+  </div>
+  <div class="note">
+    <h4>🔁 迭代记录</h4>
+    <ul>
+      <li>推送版前后做了 v1 → v4 四轮</li>
+      <li>调过模块间距、正文字号、互动图文字大小</li>
+      <li>v4 统一了站点封面、依依引导语和任务卡</li>
+    </ul>
+  </div>
+</section>
+
+<footer>内容整理自「北京西山国家森林公园」公众号推文《秋日限定遛娃指南｜来西山捡秋、做蝴蝶生态标本》<br>制作：kpmei × 依依</footer>
+
+<script>
+  // 点流程卡或标签 → 切换窄屏下显示的手机预览，并高亮对应步骤
+  const phones = document.querySelectorAll('.phone');
+  const steps = document.querySelectorAll('.step');
+  const tabs = document.querySelectorAll('#tabs button');
+  function show(i) {
+    phones.forEach((p, k) => p.classList.toggle('on', k === i));
+    steps.forEach((s, k) => s.classList.toggle('on', k === i));
+    tabs.forEach((t, k) => t.classList.toggle('on', k === i));
+  }
+  steps.forEach(s => s.addEventListener('click', () => {
+    show(+s.dataset.i);
+    if (innerWidth <= 1100) document.getElementById('tabs').scrollIntoView({ behavior: 'smooth' });
+    else phones[+s.dataset.i].scrollIntoView({ behavior: 'smooth', block: 'center' });
+  }));
+  tabs.forEach(t => t.addEventListener('click', () => show(+t.dataset.i)));
+</script>
+</body>
+</html>
