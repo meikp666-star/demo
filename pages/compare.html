@@ -9,7 +9,7 @@
 :root{
   --bg:#f5f5f7;--card:#fff;--ink:#1d1d1f;--ink-2:#424245;--ink-3:#6e6e73;--line:#d2d2d7;
   --blue:#0071e3;--blue-h:#0077ed;
-  --pro:#5e5ce6;--flash:#ff9f0a;--opus:#bf5af2;--gyx:#30b0c7;--sonnet:#34c759;--haiku:#ff375f;
+  --pro:#5e5ce6;--flash:#ff9f0a;--opus:#bf5af2;--gyx:#30b0c7;--sonnet:#34c759;--haiku:#ff375f;--kimi:#1f8a70;
   --ease:cubic-bezier(.16,1,.3,1);
 }
 html{scroll-behavior:smooth;-webkit-text-size-adjust:100%}
@@ -122,7 +122,7 @@ footer{text-align:center;color:var(--ink-3);font-size:12px;padding:10px 0 48px}
   <header class="hero rv">
     <div class="eyebrow">同一道题 · 不同模型 · 不同轮次</div>
     <h1><span id="cnt">十二</span>份答卷，<span>一个依依。</span></h1>
-    <p>同一个提示词，交给内置 Pro、Flash、Haiku、Sonnet、Opus 5.5 与 GYXAPI Opus 5.5 分别作答。花费、耗时、效果，一页看清。</p>
+    <p>同一个提示词，交给内置 Pro、Flash、Haiku、Sonnet、Opus 5.5 、GYXAPI Opus 5.5 与 Kimi 3.1 Pro 分别作答。花费、耗时、效果，一页看清。</p>
   </header>
 
   <section id="prompt" class="prompt rv">
@@ -172,9 +172,10 @@ const ITEMS = [
   {file:"haiku-2.html", model:"内置 Haiku", fam:"haiku", round:"第 2 次", cost:0.07, cur:"¥", timeS:27, timeTxt:"27s", note:"", size:10675, batch:"new", title:"依依 Yiyi · 全能助手", src:"介绍依依_内置haiku，第2次，27s，0.07元.html"},
   {file:"opus55.html", model:"内置 Opus 5.5", fam:"opus", round:"第 1 次", cost:20, cur:"¥", timeS:null, timeTxt:"—", note:"", size:225411, batch:"old", title:"依依 Yiyi — 懂你的，才叫助手。", src:"pages/opus55.html"},
   {file:"opus55-2.html", model:"内置 Opus 5.5", fam:"opus", round:"第 2 次", cost:20, cur:"¥", timeS:1500, timeTxt:"25min", note:"", size:240131, batch:"new", title:"依依 - 你的全能助手", src:"介绍依依_内置opus5.5，第二次，20元，25min.html"},
-  {file:"gyxapi-opus55.html", model:"GYXAPI Opus 5.5", fam:"gyx", round:"—", cost:2.24, cur:"约 $", timeS:null, timeTxt:"—", note:"", size:167153, batch:"old", title:"依依 Yiyi - 懂你的事，替你办事", src:"pages/gyxapi-opus55.html"}
+  {file:"gyxapi-opus55.html", model:"GYXAPI Opus 5.5", fam:"gyx", round:"—", cost:2.24, cur:"约 $", timeS:null, timeTxt:"—", note:"", size:167153, batch:"old", title:"依依 Yiyi - 懂你的事，替你办事", src:"pages/gyxapi-opus55.html"},
+  {file:"kimi31pro-1.html", model:"Kimi 3.1 Pro", fam:"kimi", round:"第 1 次", cost:30, cur:"¥", timeS:1920, timeTxt:"32min", note:"花费为约数", size:70305, batch:"new", title:"依依｜不止回答，更能做到", src:"pages/kimi31pro-1.html"}
 ];
-const COLOR = {pro:"var(--pro)", flash:"var(--flash)", opus:"var(--opus)", gyx:"var(--gyx)", sonnet:"var(--sonnet)", haiku:"var(--haiku)"};
+const COLOR = {pro:"var(--pro)", flash:"var(--flash)", opus:"var(--opus)", gyx:"var(--gyx)", sonnet:"var(--sonnet)", haiku:"var(--haiku)", kimi:"var(--kimi)"};
 const BATCH = {old:"早前尝试", new:"本次新增"};
 const href = f => encodeURIComponent(f);
 const kb = b => b>=1048576 ? (b/1048576).toFixed(1)+" MB" : (b/1024).toFixed(b>102400?0:1)+" KB";
@@ -183,7 +184,7 @@ const cny = ITEMS.filter(i=>i.cur==="¥");
 const maxCost = Math.max(...cny.map(i=>i.cost));
 const timed = ITEMS.filter(i=>i.timeS!=null);
 const maxT = Math.max(...timed.map(i=>i.timeS));
-const CN = ["零","一","二","三","四","五","六","七","八","九","十","十一","十二"];
+const CN = ["零","一","二","三","四","五","六","七","八","九","十","十一","十二","十三","十四","十五"];
 document.getElementById("cnt").textContent = CN[ITEMS.length] || ITEMS.length;
 
 const totalCost = cny.reduce((s,i)=>s+i.cost,0);
@@ -213,7 +214,7 @@ document.getElementById("grid").innerHTML = ITEMS.map((it,i)=>`
     </div>
   </article>`).join("");
 
-const FILTERS = [["all","全部"],["new","本次新增"],["old","早前尝试"],["pro","Pro"],["flash","Flash"],["haiku","Haiku"],["sonnet","Sonnet"],["opus","Opus 5.5"],["gyx","GYXAPI"]];
+const FILTERS = [["all","全部"],["new","本次新增"],["old","早前尝试"],["pro","Pro"],["flash","Flash"],["haiku","Haiku"],["sonnet","Sonnet"],["opus","Opus 5.5"],["gyx","GYXAPI"],["kimi","Kimi"]];
 const fseg = document.getElementById("segFilter");
 fseg.innerHTML = FILTERS.map(([v,l],k)=>`<button data-v="${v}" class="${k?"":"on"}">${l}</button>`).join("");
 fseg.querySelectorAll("button").forEach(b=>b.onclick=()=>{
