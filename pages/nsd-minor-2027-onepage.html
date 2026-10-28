@@ -10,6 +10,7 @@
   --gold:#BE9455;--gold-lt:#DCC08A;--gold-pale:#F6EFE2;--gold-ink:#8A6A39;
   --cream:#F5F1E8;--paper:#FFFFFF;--ink:#1B1714;--ink-2:#463F38;--ink-3:#756C61;--line:#E6DFD2
 }
+html{-webkit-text-size-adjust:100%;text-size-adjust:100%}
 html,body{height:100%}
 body{
   font-family:-apple-system,BlinkMacSystemFont,'PingFang SC','Hiragino Sans GB','Microsoft YaHei','Segoe UI',sans-serif;
@@ -17,9 +18,9 @@ body{
   -webkit-print-color-adjust:exact;print-color-adjust:exact;
   display:flex;align-items:center;justify-content:center;overflow:hidden;line-height:1.6
 }
-.stage{width:1123px;height:794px;flex:none;transform-origin:center center}
+.stage{width:1123px;min-height:794px;flex:none;transform-origin:center center}
 .sheet{
-  width:1123px;height:794px;background:var(--cream);position:relative;overflow:hidden;
+  width:1123px;min-height:794px;background:var(--cream);position:relative;overflow:hidden;
   display:grid;grid-template-columns:330px 1fr;gap:14px;padding:18px;
   box-shadow:0 30px 80px -30px rgba(74,4,8,.45)
 }
@@ -158,13 +159,13 @@ svg{fill:none;stroke:currentColor;stroke-width:1.7;stroke-linecap:round;stroke-l
 @media print{
   html,body{width:297mm;height:210mm;background:#fff;overflow:visible;display:block}
   .stage{transform:none!important;width:297mm;height:210mm}
-  .sheet{box-shadow:none}
+  .sheet{box-shadow:none;height:794px;min-height:0}
   .tools{display:none}
 }
 </style>
-<style></style><style id="cfmind-preview-fullscreen-scroll">html, body { overflow-y: auto !important; }</style></head>
-<body style="overflow: hidden;">
-<div class="stage" id="stage" style="transform: scale(0.642317);" spellcheck="true">
+</head>
+<body>
+<div class="stage" id="stage">
 <div class="sheet">
 
   <!-- 封面 -->
@@ -266,7 +267,7 @@ svg{fill:none;stroke:currentColor;stroke-width:1.7;stroke-linecap:round;stroke-l
 </div>
 </div>
 
-<div class="tools" spellcheck="true">
+<div class="tools">
   <button type="button" id="btnFit">适应屏幕</button>
   <button type="button" class="p" id="btnPrint">打印 / 存为 PDF</button>
 </div>
@@ -275,10 +276,14 @@ svg{fill:none;stroke:currentColor;stroke-width:1.7;stroke-linecap:round;stroke-l
   var stage=document.getElementById('stage'),W=1123,H=794,mode='fit';
   function fit(){
     if(mode!=='fit'){stage.style.transform='none';document.body.style.overflow='auto';return}
-    var k=Math.min((window.innerWidth-40)/W,(window.innerHeight-40)/H);
+    var h=Math.max(stage.offsetHeight,H);
+    var k=Math.min((window.innerWidth-40)/W,(window.innerHeight-40)/h);
     stage.style.transform='scale('+Math.max(k,.2)+')';document.body.style.overflow='hidden';
   }
   window.addEventListener('resize',fit);
+  window.addEventListener('load',fit);
+  if(document.fonts&&document.fonts.ready)document.fonts.ready.then(fit);
+  if(window.ResizeObserver)new ResizeObserver(fit).observe(stage);
   document.getElementById('btnFit').addEventListener('click',function(){
     mode=mode==='fit'?'real':'fit';this.textContent=mode==='fit'?'适应屏幕':'原始大小';fit();
   });
@@ -288,4 +293,4 @@ svg{fill:none;stroke:currentColor;stroke-width:1.7;stroke-linecap:round;stroke-l
 </script>
 
 
-<div style="position: fixed; z-index: 10375; pointer-events: none; border: 2px solid rgb(20, 147, 255); background: rgba(20, 147, 255, 0.14); box-sizing: border-box; border-radius: 4px; display: none;"></div><div style="position: fixed; z-index: 10375; pointer-events: none; border: 2px solid rgb(20, 147, 255); background: rgba(20, 147, 255, 0.14); box-sizing: border-box; border-radius: 4px; display: none;"></div></body></html>
+</body></html>
