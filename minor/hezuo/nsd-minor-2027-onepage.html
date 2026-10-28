@@ -11,7 +11,7 @@
   --cream:#F5F1E8;--paper:#FFFFFF;--ink:#1B1714;--ink-2:#463F38;--ink-3:#756C61;--line:#E6DFD2
 }
 html{-webkit-text-size-adjust:100%;text-size-adjust:100%}
-html,body{height:100%}
+html,body{height:100%;overflow:hidden}
 body{
   font-family:-apple-system,BlinkMacSystemFont,'PingFang SC','Hiragino Sans GB','Microsoft YaHei','Segoe UI',sans-serif;
   color:var(--ink);background:#DCD5C8;-webkit-font-smoothing:antialiased;
@@ -277,7 +277,7 @@ svg{fill:none;stroke:currentColor;stroke-width:1.7;stroke-linecap:round;stroke-l
   function fit(){
     if(mode!=='fit'){stage.style.transform='none';document.body.style.overflow='auto';return}
     var h=Math.max(stage.offsetHeight,H);
-    var k=Math.min((window.innerWidth-40)/W,(window.innerHeight-40)/h);
+    var k=Math.min((document.documentElement.clientWidth-40)/W,(document.documentElement.clientHeight-40)/h);
     stage.style.transform='scale('+Math.max(k,.2)+')';document.body.style.overflow='hidden';
   }
   window.addEventListener('resize',fit);
