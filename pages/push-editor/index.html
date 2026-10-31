@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="referrer" content="no-referrer">
-<title>推送可视化编辑器 v2</title>
+<title>推送可视化编辑器</title>
 <style>
   :root{--g:#07c160;--bd:#e3e5e8;--bg:#f2f3f5;--tx:#1f2329;--sub:#8a9099;--warn:#ff9f1a}
   *{box-sizing:border-box}
@@ -20,6 +20,7 @@
   .btn.pri:hover{color:#fff;filter:brightness(1.05)}
   .btn.danger:hover{border-color:#e54545;color:#e54545}
   .btn:disabled{opacity:.4;cursor:not-allowed}
+  .btn.sm{font-size:12px;padding:4px 8px;color:#555}
   .modes{display:inline-flex;border:1px solid var(--g);border-radius:8px;overflow:hidden}
   .modes button{border:0;background:#fff;padding:5px 12px;cursor:pointer;color:var(--g)}
   .modes button.on{background:var(--g);color:#fff}
@@ -140,27 +141,124 @@
   #guides{position:absolute;inset:0;pointer-events:none;z-index:6}
   #guides .gl{position:absolute;background:#ff2d8a}
   #guides .gl.ins{background:var(--g);border-radius:2px}
+  .mbox{position:fixed;inset:0;background:rgba(0,0,0,.35);display:flex;align-items:center;justify-content:center;z-index:30} .mbox.hidden{display:none} .mbox .fd{background:#fff;border-radius:10px;width:min(560px,92vw);max-height:86vh;display:flex;flex-direction:column;box-shadow:0 10px 40px rgba(0,0,0,.25);overflow:auto} .mbox .ft{padding:14px 16px 4px;font-weight:bold} .mbox .fs{padding:0 16px 8px;color:#4e5560;font-size:13px;line-height:1.7} .mbox .fs small{color:var(--sub)} .mbox .fb{display:flex;flex-wrap:wrap;gap:8px;padding:12px 16px} .mbox .fb:empty{padding:6px} .mform{padding:0 16px;display:flex;flex-direction:column;gap:10px} .mform label{display:flex;flex-direction:column;gap:4px;font-size:12px;color:var(--sub)} .mform input,.mform textarea{border:1px solid var(--bd);border-radius:6px;padding:6px 8px;color:var(--tx);font-size:13px;resize:vertical} .mcov{display:flex;gap:10px;align-items:flex-start;font-size:12px;color:var(--sub)} .mcov .ml{flex:none;padding-top:4px} .mcov .cv{width:188px;height:80px;border-radius:6px;border:1px dashed var(--bd);background:#f7f8fa center/cover no-repeat;flex:none;display:flex;align-items:center;justify-content:center} .mcb{display:flex;flex-direction:column;gap:6px;flex:1} .mcb small{font-size:11px} #bMeta.on{border-color:var(--g);color:var(--g2);font-weight:600} .menu button.off{opacity:.5} #fillBox{position:fixed;inset:0;background:rgba(0,0,0,.35);display:flex;align-items:center;justify-content:center;z-index:10}
+  #fillBox.hidden{display:none}
+  #fillBox .fd{background:#fff;border-radius:10px;width:min(560px,92vw);max-height:80vh;display:flex;flex-direction:column;box-shadow:0 10px 40px rgba(0,0,0,.25)}
+  #fillBox .ft{padding:14px 16px 4px;font-weight:bold}
+  #fillBox .fs{padding:0 16px 8px;color:var(--sub);font-size:12px;line-height:1.6}
+  #fillBox .fl{overflow:auto;margin:0 16px;border:1px solid var(--bd);border-radius:6px;font-size:12px}
+  #fillBox .fr{display:flex;gap:8px;padding:5px 8px;border-top:1px solid var(--bd)}
+  #fillBox .fr:first-child{border-top:0}
+  #fillBox .fn{font-weight:bold;flex:none;max-width:40%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  #fillBox .fu{flex:1;color:var(--sub);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  #fillBox .fc{flex:none;color:var(--sub)}
+  #fillBox .fb{display:flex;flex-wrap:wrap;gap:8px;padding:12px 16px}
   #drop{position:fixed;inset:0;background:rgba(7,193,96,.12);border:3px dashed var(--g);display:none;align-items:center;justify-content:center;font-size:20px;color:var(--g);z-index:8}
+
+  /* ===== 2026-10-30 界面整理：灰色=普通操作，绿色=主操作和选中，橙色=检查，红色=删除 ===== */
+  :root{--g:#07c160;--g2:#06a552;--gl:#e8f8ef;--bd:#e3e5e8;--bg:#f4f5f7;--tx:#1f2329;--sub:#6b7280;--mute:#a0a6ae;--warn:#f08c00;--wl:#fff4e0;--red:#e54545;--hv:#f2f3f5}
+  header{height:52px;gap:8px;padding:0 14px;box-shadow:0 1px 0 var(--bd)}
+  header h1{font-size:15px;margin-right:4px;color:#111}
+  .dv{width:1px;height:22px;background:var(--bd);margin:0 4px;flex:none}
+  .btn{height:32px;display:inline-flex;align-items:center;gap:4px;padding:0 12px;border-radius:7px;border-color:#d9dce0;transition:background .12s,border-color .12s,color .12s}
+  .btn:hover{border-color:#c4c8ce;color:var(--tx);background:var(--hv)}
+  .btn:active{transform:translateY(1px)}
+  .btn.ghost{border-color:transparent;background:transparent;color:var(--sub)}
+  .btn.ghost:hover{background:var(--hv);color:var(--tx)}
+  .btn.pri{background:var(--g);border-color:var(--g);color:#fff;font-weight:600}
+  .btn.pri:hover{background:var(--g2);border-color:var(--g2);color:#fff;filter:none}
+  .btn:disabled,.btn:disabled:hover{opacity:.35;background:#fff;border-color:#d9dce0;transform:none}
+  .ibg{display:inline-flex}
+  .ibg .btn.ic{width:34px;padding:0;justify-content:center;font-size:16px;border-radius:0}
+  .ibg .btn.ic:first-child{border-radius:7px 0 0 7px}
+  .ibg .btn.ic+.btn.ic{border-radius:0 7px 7px 0;margin-left:-1px}
+  .modes{height:32px;border:1px solid #d9dce0;border-radius:8px;padding:2px;background:var(--bg);gap:2px}
+  .modes button{border-radius:6px;color:var(--sub);padding:0 12px;background:transparent}
+  .modes button:hover{color:var(--tx)}
+  .modes button.on{background:#fff;color:var(--g2);font-weight:600;box-shadow:0 1px 3px rgba(0,0,0,.12)}
+  .btn.chk{color:#8a5300}
+  .btn.chk:hover{background:var(--wl);border-color:#ffc46b;color:#8a5300}
+  #bXm.on{background:var(--wl);border-color:var(--warn);color:#8a5300;font-weight:600}
+  .badge{display:none;min-width:18px;height:18px;padding:0 5px;border-radius:9px;font-size:11px;line-height:18px;text-align:center;color:#fff;font-weight:600}
+  .badge.err{display:inline-block;background:var(--red)}
+  .badge.warn{display:inline-block;background:var(--warn)}
+  .badge.ok{display:inline-block;background:var(--g)}
+  .split{position:relative;display:inline-flex}
+  .split #bSave{border-radius:7px 0 0 7px;padding:0 14px}
+  .split .caret{border-radius:0 7px 7px 0;padding:0 8px;border-left:1px solid rgba(255,255,255,.35)}
+  .split .caret.open{background:var(--g2)}
+  .menu{position:absolute;right:0;top:38px;min-width:250px;background:#fff;border:1px solid var(--bd);border-radius:10px;box-shadow:0 8px 28px rgba(0,0,0,.14);padding:6px;z-index:20}
+  .menu button{display:block;width:100%;text-align:left;border:0;background:none;padding:7px 10px;border-radius:6px;cursor:pointer}
+  .menu button:hover{background:var(--gl)}
+  .menu button b{display:block;font-weight:600}
+  .menu button small{display:block;color:var(--sub);font-size:12px}
+  main{height:calc(100% - 52px - 26px)}
+  .stagebar{min-height:40px;gap:8px;padding:5px 10px}
+  .seg{border-color:#d9dce0;border-radius:7px;background:var(--bg);padding:2px;gap:2px}
+  .seg button{border-radius:5px;padding:3px 10px;background:transparent;color:var(--sub)}
+  .seg button+button{border-left:0}
+  .seg button.on{background:#fff;color:var(--g2);font-weight:600;box-shadow:0 1px 3px rgba(0,0,0,.12)}
+  .sbtn{border:1px solid #d9dce0;background:#fff;border-radius:6px;padding:3px 10px;cursor:pointer;font:12px Consolas,monospace;color:var(--sub)}
+  .sbtn:hover{background:var(--hv);color:var(--tx)}
+  .sbtn.on{background:#1e1f22;border-color:#1e1f22;color:#fff}
+  #hint{padding:6px 12px;background:#fafbfc;border-bottom:1px solid var(--bd);color:var(--sub)}
+  #hint b{color:var(--g2)}
+  .colh{padding:8px 12px;background:#fafbfc;font-size:13px}
+  .colh button{height:24px;border-color:#d9dce0;border-radius:6px;padding:0 8px;color:var(--sub)}
+  .colh button:hover{border-color:#c4c8ce;color:var(--tx);background:var(--hv)}
+  .card{padding:12px}
+  .crumb span{background:var(--bg)}
+  .crumb span:not(.lbl):hover{outline:1px solid var(--g);background:var(--gl)}
+  .acts{display:grid;grid-template-columns:repeat(4,1fr);gap:5px;margin-top:8px}
+  .acts button,.tools button{height:28px;border:1px solid #d9dce0;background:#fff;border-radius:6px;cursor:pointer;font-size:12px;padding:0 6px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .acts button:hover,.tools button:hover{border-color:#c4c8ce;background:var(--hv);color:var(--tx)}
+  .acts button.danger{grid-column:4;color:var(--red);border-color:#f3c5c5}
+  .acts button.danger:hover{background:#fff1f0;border-color:var(--red);color:var(--red)}
+  .tools.g3{display:grid;grid-template-columns:repeat(3,1fr);gap:5px}
+  .note{color:var(--sub)}
+  details.sec>summary{padding:10px 12px;font-size:13px;background:#fafbfc;user-select:none}
+  details.sec>summary:hover{background:var(--hv)}
+  details.sec[open]>summary{border-bottom:1px solid #eef0f2}
+  .sb{padding:10px 12px 12px}
+  .tree-row{padding-top:4px;padding-bottom:4px}
+  .tree-row:hover{background:#f6f7f9}
+  .tree-row.on{background:var(--gl);box-shadow:inset 3px 0 0 var(--g)}
+  .tree-row .lb.dim{color:var(--mute);font-style:italic}
+  .tree-row .eye{opacity:.35}
+  .tree-row:hover .eye,.tree-row.off .eye{opacity:1}
+  .empty{color:var(--sub)}
+  .empty b{color:var(--g2)}
+  footer{gap:16px}
+  #stSaved{color:var(--g2)}
+  #toast{left:50%;transform:translateX(-50%) translateY(6px);bottom:44px;padding:9px 18px;border-radius:20px;font-size:13px;box-shadow:0 6px 20px rgba(0,0,0,.18);transition:opacity .2s,transform .2s;max-width:80vw;text-align:center}
+  #toast.show{transform:translateX(-50%) translateY(0)}
+  .xmh{background:var(--wl)}
+  #fillBox .fd{border-radius:12px}
 </style>
 </head>
 <body>
 <header>
-  <h1>✨ 推送可视化编辑器</h1>
+  <h1>✨ 推送编辑器</h1>
+  <button class="btn" id="bOpen" title="打开 HTML 文件（Ctrl+O）&#10;也可以直接把文件拖进窗口">📂 打开</button>
+  <input type="file" id="file" accept=".html,.htm,.txt" hidden>
+  <span class="dv"></span>
   <div class="modes">
-    <button id="mEdit" class="on" title="单击选中、双击改字、右侧改样式">✏️ 编辑</button>
+    <button id="mEdit" class="on" title="单击选中、拖动移动、双击改字，右侧改样式">✏️ 编辑</button>
     <button id="mPrev" title="所有互动效果按真实样子运行，可以点盒子">▶ 预览互动</button>
   </div>
-  <button class="btn" id="bReset" title="把所有动画恢复到刚打开时的样子">↺ 动画复位</button>
-  <button class="btn" id="bOpen">打开文件</button>
-  <input type="file" id="file" accept=".html,.htm,.txt" hidden>
-  <button class="btn" id="bUndo" title="Ctrl+Z">↶ 撤销</button>
-  <button class="btn" id="bRedo" title="Ctrl+Y">↷ 重做</button>
-  <button class="btn" id="bXm" title="按秀米导入规则检查：列出问题、点一下定位、能修的直接修；导出前自动修">🧵 秀米模式</button>
+  <button class="btn ghost" id="bReset" title="把所有动画恢复到刚打开时的样子">↺ 复位动画</button>
+  <span class="dv"></span>
+  <div class="ibg">
+    <button class="btn ic" id="bUndo" title="撤销（Ctrl+Z）">↶</button><button class="btn ic" id="bRedo" title="重做（Ctrl+Y）">↷</button>
+  </div>
   <span class="sp"></span>
-  <button class="btn" id="bSrc" title="展开/收起源码">{ } 源码</button>
-  <button class="btn" id="bCopyCode">复制源码</button>
-  <button class="btn" id="bCopyRich">复制排版</button>
-  <button class="btn pri" id="bSave">下载 HTML</button>
+  <button class="btn" id="bMeta" title="标题、作者、摘要、封面：「发到公众号」时一起填进编辑页">📝 文章信息</button> <button class="btn chk" id="bXm" title="按公众号 / 秀米的写法规则检查：列出问题、点一下定位、能修的直接修&#10;开着时，导出前会自动修复">🧵 发布检查<span class="badge" id="xmBadge"></span></button>
+  <div class="split">
+    <button class="btn pri" id="bSave" title="导出（Ctrl+S）&#10;装了 Edge 扩展「公众号推送可视化微调」：直接发到公众号编辑页&#10;没装：下载压缩包（代码 + 图片 + 文章信息）">⬇ 导出</button><button class="btn pri caret" id="bMore" title="更多导出方式">▾</button>
+    <div class="menu hidden" id="exMenu">
+      <button id="bMpSend"><b>🚀 发到公众号</b><small>本地图片自动传微信图床；需装 Edge 扩展「公众号推送可视化微调」</small></button> <button id="bZip"><b>📦 导出压缩包</b><small>代码 + 图片 + 文章信息，发给相关负责人</small></button> <button id="bMpRead"><b>⤵ 从公众号读取</b><small>把公众号编辑页里的正文读回编辑器检查</small></button>
+    </div>
+  </div>
 </header>
 
 <main>
@@ -169,8 +267,10 @@
       <span class="seg" id="wseg">
         <button data-w="375" class="on">手机 375</button><button data-w="578">编辑器 578</button><button data-w="0">铺满</button>
       </span>
-      <span id="hint"></span>
+      <span class="sp"></span>
+      <button class="sbtn" id="bSrc" title="展开 / 收起源码，可以直接改代码">{ } 源码</button>
     </div>
+    <div id="hint"></div>
     <div id="stageWrap">
       <div id="stage" style="width:375px"><iframe id="frame"></iframe><div id="ov"></div><div id="hov"></div><div id="guides"></div></div>
     </div>
@@ -190,9 +290,17 @@
   </aside>
 </main>
 
-<footer><span id="stInfo">就绪</span><span id="stSize"></span><span class="sp"></span><span>内容自动保存在本浏览器</span></footer>
+<footer><span id="stInfo">就绪</span><span class="sp"></span><span id="stSize"></span><span id="stSaved" title="内容自动保存在这个浏览器里，关掉再打开还在">内容自动保存在本浏览器</span></footer>
 <div id="toast"></div>
-<div id="drop">松开即可打开文件</div>
+<div id="fillBox" class="hidden"><div class="fd">
+  <div class="ft"></div>
+  <div class="fs">选中这些图片（或它们所在的文件夹），编辑器按文件名对上后把图读进来，就能正常显示和导出打包。也可以直接把图片拖进编辑器。</div>
+  <div class="fl"></div>
+  <div class="fb"><button class="btn pri" data-ffiles>选择图片</button><button class="btn" data-fdir>选择文件夹</button><span class="sp"></span><button class="btn" data-fcancel>取消导出</button><button class="btn" data-fgo>先不补</button></div>
+</div></div>
+<div id="mpBox" class="mbox hidden"><div class="fd"><div class="ft"></div><div class="fs"></div><div class="fb"></div></div></div> <div id="metaBox" class="mbox hidden"><div class="fd"> <div class="ft">📝 文章信息</div> <div class="fs">「发到公众号」时一起填进公众号编辑页；留空的项不改动编辑页里原有的内容。</div> <div class="mform"> <label>标题<input id="mTitle" maxlength="64" placeholder="文章标题"></label> <label>作者<input id="mAuthor" maxlength="16" placeholder="可不填"></label> <label>摘要<textarea id="mDigest" maxlength="120" rows="3" placeholder="可不填，最多 120 字"></textarea></label> <div class="mcov"><span class="ml">封面</span><div id="mCovPrev" class="cv">未设置</div><div class="mcb"><button class="btn" id="mCovFile">选择本地图片</button><input id="mCovUrl" placeholder="或粘贴图片网址"><button class="btn" id="mCovClr">清除封面</button><small>本地图片发送时自动传到微信图床；会按 2.35:1 和 1:1 居中裁剪，要精确裁剪请到公众号里再调</small></div></div> </div> <div class="fb"><span class="sp"></span><button class="btn" data-mcancel>取消</button><button class="btn pri" data-mok>保存</button></div> </div></div> <input type="file" id="mCovInput" accept="image/*" hidden> <input type="file" id="fillFiles" accept="image/*" multiple hidden>
+<input type="file" id="fillDir" webkitdirectory multiple hidden>
+<div id="drop">松开即可打开文件（可以同时拖 HTML 和图片）</div>
 
 <script>
 (() => {
@@ -231,7 +339,7 @@ let mode = 'edit', wrap = {pre: '', post: ''}, doc = null;
 let sel = null, editing = null, pending = null, previewPath = null;
 let hist = [], hi = -1, hTimer = 0, rTimer = 0;
 let hidden = new Set(), shown = new Set();
-let xm = localStorage.getItem('pushEditor.xm') === '1', xmList = [], xmT = 0;   // 秀米模式
+let xm = localStorage.getItem('pushEditor.xm') === '1', xmList = [], xmT = 0;   // 发布检查
 
 /* ================= 工具函数 ================= */
 const esc = s => String(s ?? '').replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;');
@@ -302,6 +410,7 @@ window.__veReady = d => {
   doc.addEventListener('click', onDocClick, true);
   doc.addEventListener('dblclick', onDblClick, true);
   doc.addEventListener('keydown', onKey);
+  doc.addEventListener('pointerdown', () => { const m = document.getElementById('exMenu'); if (m && !m.classList.contains('hidden')){ m.classList.add('hidden'); document.getElementById('bMore').classList.remove('open'); } }, true);
   doc.addEventListener('pointerdown', onDragDown, true);
   doc.addEventListener('pointermove', onDragMove);
   doc.addEventListener('pointerup', () => endDrag(true));
@@ -313,17 +422,18 @@ window.__veReady = d => {
   if (sel) sel.setAttribute('data-ve-sel', '');
   applyMarks();
   fitFrame(); drawPanel(); drawTree(); placeOv(); updateHint();
-  if (xm) xmCheck();
+  if (xm) xmCheck(); else xmBadgeUpd(xmAudit());
 };
 function fitFrame(){ if (doc) frame.style.height = Math.max(560, doc.documentElement.scrollHeight) + 'px'; }
 
-function serialize(){
+function serialize(hook){
   const b = doc.body.cloneNode(true);
   b.querySelectorAll('script[data-ve-hook]').forEach(n => n.remove());
   const all = [b, ...b.querySelectorAll('*')];
   all.forEach(n => { MARK_ATTRS.forEach(a => n.removeAttribute(a)); });
   // 浏览器解析表格时一定会自动加 <tbody>，导出时去掉，保持源码干净（秀米规则）
   b.querySelectorAll('tbody').forEach(t => t.replaceWith(...t.childNodes));
+  if (hook) hook(b);
   return wrap.pre + b.innerHTML + wrap.post;
 }
 
@@ -336,7 +446,7 @@ function changed(structural){
   else { clearTimeout(hTimer); hTimer = setTimeout(() => pushHist(codeEl.value), 400); }
   placeOv(); fitFrame();
   $('#stSize').textContent = (codeEl.value.length / 1024).toFixed(1) + ' KB';
-  if (xm){ clearTimeout(xmT); xmT = setTimeout(xmCheck, 300); }
+  clearTimeout(xmT); xmT = setTimeout(() => { if (xm) xmCheck(); else xmBadgeUpd(xmAudit()); }, 400);
 }
 
 /* ================= 选中 / 编辑 ================= */
@@ -648,7 +758,7 @@ function drawTree(){
       const cls = (c === sel ? ' on' : '') + (anc.has(c) ? ' anc' : '') + (hidden.has(c) ? ' off' : '');
       h += '<div class="tree-row' + cls + '" style="padding-left:' + (4 + depth * 14) + 'px" data-path="' + path + '">' +
            '<span class="tw"' + (kids ? ' data-tw="' + path + '" title="展开/收起"' : '') + '>' + (kids ? (isOpen ? '▾' : '▸') : '') + '</span>' +
-           '<span class="tg">' + esc(tg) + '</span><span class="lb" title="' + esc(labelOf(c)) + '">' + esc(labelOf(c)) + '</span>' + (kids ? '<span class="kn">' + kids + '</span>' : '') +
+           '<span class="tg">' + esc(tg) + '</span><span class="lb' + (/^\((空|无文字)\)$/.test(labelOf(c)) ? ' dim' : '') + '" title="' + esc(labelOf(c)) + '">' + esc(labelOf(c)) + '</span>' + (kids ? '<span class="kn">' + kids + '</span>' : '') +
            '<button class="eye" data-eye="' + path + '" title="编辑器里隐藏/显示">' + (hidden.has(c) ? '🙈' : '👁') + '</button></div>';
       if (kids && isOpen) walk(c, depth + 1);
     });
@@ -810,11 +920,11 @@ function drawPanel(){
   }
   const el = sel, tag = el.tagName.toLowerCase(), isSvg = isSvgNode(el);
   const r = el.getBoundingClientRect(), invisible = !r.width && !r.height;
-  let h = '<div class="card"><div class="crumb">' + crumbs() + '</div>' + kidsChips() + '<div class="tools">' +
-    '<button data-act="parent">⬆ 选上级</button><button data-act="child">⬇ 选下级</button><button data-act="up">↑ 上移</button><button data-act="down">↓ 下移</button>' +
+  let h = '<div class="card"><div class="crumb">' + crumbs() + '</div>' + kidsChips() + '<div class="acts">' +
+    '<button data-act="parent" title="选中外面一层">⬆ 选上级</button><button data-act="child" title="选中里面第一个">⬇ 选下级</button><button data-act="up" title="和前一个换位置">↑ 上移</button><button data-act="down" title="和后一个换位置">↓ 下移</button>' +
     '<button data-act="dup">⧉ 复制</button>' +
-    '<button data-act="hide">' + (hidden.has(el) ? '👁 显示' : '🙈 隐藏') + '</button>' +
-    '<button data-act="del" class="danger">🗑 删除</button></div></div>';
+    '<button data-act="hide" title="只在编辑器里隐藏，不影响成品">' + (hidden.has(el) ? '👁 显示' : '🙈 隐藏') + '</button>' +
+    '<button data-act="del" class="danger" title="删除（Delete 键）">🗑 删除</button></div></div>';
   if (invisible) h += '<div class="warnbox">这个元素现在看不见（被盖住或隐藏了）。可以点下面的「打开上层」或在图层里点 👁 显示。</div>';
 
   h += carouselSec(el);
@@ -877,7 +987,7 @@ function drawPanel(){
     let body = own.map(x => item(x, panelImgs.indexOf(x))).join('');
     if (inner.length) body += '<div class="note" style="margin:6px 0">' + (own.length ? '相关的还有' : '里面或上级有') + ' ' + inner.length + ' 张图（含背景图），可以直接在这里换：</div>' + inner.slice(0, 20).map(x => item(x, panelImgs.indexOf(x))).join('') + (inner.length > 20 ? '<div class="note">…只列出前 20 张，其余的选中下级再换</div>' : '');
     h += sec('🖼 图片', body +
-      '<div class="note">本地图片只用来预览；正式发布要换成微信图床（mmbiz.qpic.cn）地址。</div>' +
+      '<div class="note">本地图片：导出时自动处理——发到公众号会传到微信图床，导出压缩包会一起打包。</div>' +
       '<input type="file" id="imgFile" accept="image/*" hidden>', own.length > 0 || inner.some(x => el.contains(x.el)));
   }
   if (tag === 'a') h += sec('🔗 链接', row('href', '<input type="text" value="' + esc(el.getAttribute('href')) + '"' + ctl('attr', 'href') + '>'));
@@ -1010,7 +1120,7 @@ panel.addEventListener('change', e => {
     const f = e.target.files[0]; if (!f) return;
     const x = panelImgs[pickIdx];
     const rd = new FileReader();
-    rd.onload = () => { if (x) setImg(x, rd.result); changed(true); drawPanel(); toast('已替换为本地图片（仅预览）'); };
+    rd.onload = () => { if (x) setImg(x, rd.result); changed(true); drawPanel(); toast('已换成本地图片：导出时自动上传或打包'); };
     rd.readAsDataURL(f);
     e.target.value = '';
   }
@@ -1083,6 +1193,11 @@ function updBtns(){ $('#bUndo').disabled = hi <= 0; $('#bRedo').disabled = hi >=
 
 function onKey(e){
   const typing = /^(INPUT|TEXTAREA|SELECT)$/.test(e.target.tagName) || editing;
+  if ((e.ctrlKey || e.metaKey) && !e.shiftKey && !e.altKey){
+    if (e.key === 's'){ e.preventDefault(); doExport(); return; }
+    if (e.key === 'o'){ e.preventDefault(); $('#file').click(); return; }
+  }
+  if (e.key === 'Escape' && !exMenu.classList.contains('hidden')){ exMenu.classList.add('hidden'); $('#bMore').classList.remove('open'); return; }
   if ((e.ctrlKey || e.metaKey) && !typing){
     if (e.key === 'z' && !e.shiftKey){ e.preventDefault(); go(-1); }
     else if (e.key === 'y' || (e.key === 'z' && e.shiftKey)){ e.preventDefault(); go(1); }
@@ -1301,14 +1416,14 @@ function posSec(el){
   if (moverFor(el)){
     const cn = isSvgNode(el) ? '整张图' : '定位容器';
     return sec('📍 位置 / 对齐', '<div class="note" style="margin:0 0 6px">在左边<b>按住直接拖</b>，靠近' + cn + '或其它元素的边缘、中线时会自动吸附（出现粉色参考线）。按住 Alt 拖不吸附，按住 Shift 只沿水平或竖直方向；方向键微调 1 像素，Shift+方向键 10 像素。</div>' +
-      '<div class="note" style="margin:0 0 4px">对齐到' + cn + '：</div><div class="tools">' +
+      '<div class="note" style="margin:0 0 4px">对齐到' + cn + '：</div><div class="tools g3">' +
       [['l', '⇤ 靠左'], ['c', '↔ 水平居中'], ['r', '⇥ 靠右'], ['t', '⤒ 靠上'], ['m', '↕ 垂直居中'], ['b', '⤓ 靠下']].map(([k, n]) => '<button data-align="' + k + '">' + n + '</button>').join('') + '</div>', true);
   }
   if (reorderPrep(el)) return sec('📍 位置', '<div class="note" style="margin:0">这是正常排版里的元素，位置由前后内容决定。在左边<b>按住拖动</b>可以换到别的元素前后（绿线是放下的位置），方向键 ↑↓ 也能上下移。</div>', false);
   return '';
 }
 
-/* ================= 秀米模式：按导入规则检查 / 自动修 ================= */
+/* ================= 发布检查：按公众号 / 秀米写法规则检查 / 自动修 ================= */
 /* 规则来源：memory-topic/xiumi-import.md（2026-10-26～29 实测） */
 const ZW = /[\u200b-\u200d\u2060\ufeff]/, ZW_G = /[\u200b-\u200d\u2060\ufeff]/g;
 const NO_TEXT_PARENT = /^(script|style|textarea|title|option|noscript)$/i;
@@ -1433,24 +1548,33 @@ function fixAutoMargin(el){
   }
   el.before(wr); wr.appendChild(el);
 }
-function fixTable(t){
-  t.setAttribute('width', '100%');
-  if (!t.style.width) t.style.width = '100%';
-  t.style.tableLayout = 'fixed';
-  t.querySelectorAll('td,th').forEach(c => {
-    const sw = c.style.width, aw = c.getAttribute('width');
-    if (/%$/.test(sw) && !aw) c.setAttribute('width', sw);
-    if (/%$/.test(aw || '') && !sw) c.style.width = aw;
+/* 一行多格的排版表格 → 并排 inline-block 卡片（10C 写法：各 48%、间隔 4%）。公众号草稿路线上表格会溢出、出现淡表格线 */
+const isColTable = t => { const rs = t.rows; return rs.length === 1 && rs[0].cells.length >= 2 && !t.querySelector('table'); };
+function tableToCols(t){
+  const cells = [...t.rows[0].cells], n = cells.length, gap = 4;
+  const w = +((100 - gap * (n - 1)) / n).toFixed(2);
+  const wrap = doc.createElement('section');
+  wrap.setAttribute('style', t.getAttribute('style') || '');
+  ['width', 'table-layout', 'border-collapse', 'border-spacing', 'border', 'max-width'].forEach(k => wrap.style.removeProperty(k));
+  wrap.style.fontSize = '0'; wrap.style.lineHeight = '0';
+  cells.forEach((c, k) => {
+    const cs = doc.defaultView.getComputedStyle(c);
+    const card = doc.createElement('section');
+    card.setAttribute('style', c.getAttribute('style') || '');
+    card.style.removeProperty('width');
+    card.style.display = 'inline-block';
+    card.style.verticalAlign = c.style.verticalAlign || 'top';
+    card.style.width = w + '%';
+    card.style.boxSizing = 'border-box';
+    if (k < n - 1) card.style.marginRight = gap + '%'; else card.style.removeProperty('margin-right');
+    if (!c.style.fontSize) card.style.fontSize = cs.fontSize;
+    if (!c.style.lineHeight) card.style.lineHeight = cs.lineHeight === 'normal' ? '1.6' : cs.lineHeight;
+    if (!c.style.textAlign && c.getAttribute('align')) card.style.textAlign = c.getAttribute('align');
+    while (c.firstChild) card.appendChild(c.firstChild);
+    wrap.appendChild(card); wrapBare(card);
   });
-  if (!t.querySelector('colgroup')){
-    const row = t.querySelector('tr'); if (!row) return;
-    const ws = [...row.cells].map(c => c.getAttribute('width'));
-    if (ws.every(Boolean)){
-      const cg = doc.createElement('colgroup');
-      ws.forEach(w => { const c = doc.createElement('col'); c.setAttribute('width', w); cg.appendChild(c); });
-      t.insertBefore(cg, t.firstChild);
-    }
-  }
+  t.replaceWith(wrap);
+  if (sel === t) sel = wrap;
 }
 const pxNonZero = v => !!v && v !== 'auto' && parseFloat(v) !== 0;
 
@@ -1473,18 +1597,20 @@ function xmAudit(){
     const st0 = el.getAttribute('style') || '';
     if (/url\(/i.test(st0)) for (const m of st0.matchAll(BG_RE)) urls.push(m[2]);
     urls.forEach(u => {
-      if (/placeholder-img/.test(u)) add('warn', el, '秀米占位图：这张图不在你的秀米图库里，导入时被换掉了。把图传进图库后再改回地址');
-      else if (/^data:/i.test(u)) add('err', el, '本地图片（仅编辑器预览），导入后不显示。请换成微信图床或秀米图库地址');
-      else if (/^(file:|[a-z]:\\|\.{0,2}\/[^/])/i.test(u) || (!/^(https?:)?\/\//i.test(u) && u)) add('err', el, '相对路径 / 本机路径的图片，导入后不显示');
+      if (/placeholder-img/.test(u)) add('info', el, '秀米占位图：原图不在秀米图库里，被秀米换掉了。请换回原图地址');
+      else if (/^data:/i.test(u)) {}   // 本地图片：导出时自动处理（发到公众号会上传图床，压缩包会打包），不提醒
+      else if (/^(file:|[a-z]:\\|\.{0,2}\/[^/])/i.test(u) || (!/^(https?:)?\/\//i.test(u) && u)) add('err', el, '相对路径 / 本机路径的图片：编辑器读不到，别人和公众号也看不到。导出时可以「选择图片」按文件名补上');
+      else if (/placehold\.co\//i.test(u)) add('warn', el, 'placehold.co 占位图：公众号里不显示');
+      else if (/\.webp(\?|#|$)/i.test(u)) add('info', el, 'WebP 图：静态的公众号能显示，动态 WebP 不会动也不显示，动图请用 GIF');
     });
     if (tg === 'svg' && !el.parentElement.closest('svg')) svgs.push(el);
-    if (isSvgNode(el) || inSvg(el)) return;       // 下面是普通 HTML 的规则（SVG 里的内容秀米不动）
+    if (isSvgNode(el) || inSvg(el)) return;       // 下面是普通 HTML 的规则（SVG 里的内容不查）
 
-    if (el.hasAttribute('class')) add('warn', el, 'class 属性：秀米不认 class，样式要写在 style 里', hasStyleTag ? null : () => el.removeAttribute('class'));
-    if (tg === 'ul' || tg === 'ol') add('err', el, '<' + tg + '> 列表：秀米里缩进会变，公众号里严重错乱。可自动改成悬挂缩进段落', () => fixList(el));
-    if (/^h[1-6]$/.test(tg)) add('warn', el, '<' + tg + '> 标题：开头会被秀米加空格。可自动改成同样字号字重的 <p>', () => fixHeading(el));
-    if (tg === 'div') add('warn', el, '<div>：秀米导入时开头会加空格。可自动改成 <section>', () => replaceTag(el, 'section'));
-    if (tg === 'br') add('err', el, '<br> 换行：后面那行开头会被加空格。可自动拆成两段', () => fixBr(el));
+    if (el.hasAttribute('class')) add('warn', el, 'class 属性：公众号和秀米都不认 class，样式要写在 style 里', hasStyleTag ? null : () => el.removeAttribute('class'));
+    if (tg === 'ul' || tg === 'ol') add('err', el, '<' + tg + '> 列表：公众号里严重错乱，秀米里缩进会变。可自动改成悬挂缩进段落', () => fixList(el));
+    if (/^h[1-6]$/.test(tg)) add('info', el, '<' + tg + '> 标题：写法规则要求用 <p>。可自动改成同样字号字重的 <p>', () => fixHeading(el));
+    if (tg === 'div') add('info', el, '<div>：写法规则要求用 <section>。可自动改成 <section>', () => replaceTag(el, 'section'));
+    if (tg === 'br') add('warn', el, '<br> 换行：写法规则要求不用 <br>。可自动拆成两段', () => fixBr(el));
     const s = el.style;
     if (/flex/.test(s.display)) add('err', el, 'display:' + s.display + '：连续几行会并成一行变多列。请改成普通段落或表格', null, ['display']);
     if (s.marginLeft === 'auto' && s.marginRight === 'auto') add('err', el, 'margin:0 auto 居中：秀米里会缩小并靠左。可自动改成外层 padding / text-align 居中', () => fixAutoMargin(el), ['margin', 'margin-left', 'margin-right']);
@@ -1492,30 +1618,33 @@ function xmAudit(){
       add('err', el, 'margin 加 width:100%：公众号里会向右溢出' + (/^(img|table)$/.test(tg) ? '' : '。可自动去掉 width:100%（块元素本来就占满一行）'), /^(img|table)$/.test(tg) ? null : () => s.removeProperty('width'), ['width', 'margin', 'margin-left', 'margin-right']);
     if (s.width === '100%' && s.boxSizing !== 'border-box' && (pxNonZero(s.paddingLeft) || pxNonZero(s.paddingRight) || pxNonZero(s.borderLeftWidth) || pxNonZero(s.borderRightWidth)))
       add('err', el, 'width:100% 加 padding / 边框却没写 box-sizing:border-box：公众号里会向右溢出。可自动补上', () => { s.boxSizing = 'border-box'; }, ['width', 'box-sizing', 'padding', 'padding-left', 'padding-right']);
-    if (tg === 'table'){
-      const row = el.querySelector('tr'), cells = row ? [...row.cells] : [];
-      const pct = cells.some(c => /%$/.test(c.style.width) || /%$/.test(c.getAttribute('width') || ''));
-      if (cells.length >= 2 && pct){
-        const miss = [];
-        if (el.getAttribute('width') !== '100%') miss.push('width="100%" 属性');
-        if (s.tableLayout !== 'fixed') miss.push('table-layout:fixed');
-        if (!el.querySelector('colgroup')) miss.push('<colgroup>');
-        if ([...el.querySelectorAll('td,th')].some(c => /%$/.test(c.style.width) && !c.getAttribute('width'))) miss.push('格子的 width 属性');
-        if (miss.length) add('warn', el, '分栏表格写法不全（缺 ' + miss.join('、') + '），公众号里各列会宽窄不一。可自动补上', () => fixTable(el), ['width', 'table-layout']);
-      }
+    if (tg === 'table' && isColTable(el)) add('warn', el, '用表格并排卡片：公众号里右边会溢出，或出现淡淡的表格线。可自动改成并排卡片（各 48%、中间留 4%）', () => tableToCols(el));
+    if (tg === 'a' && el.getAttribute('href')){
+      const hr = el.getAttribute('href');
+      if (/^(https?:)?\/\/mp\.weixin\.qq\.com(\/|$|\?)/i.test(hr) && !/^(https?:)?\/\/mp\.weixin\.qq\.com\/s[\/?]/i.test(hr))
+        add('err', el, '链接到 mp.weixin.qq.com 的非文章页面：公众号预览会被拦下。请删掉链接或换成别的网址');
+      else add('info', el, '链接：经过秀米可能不保留，发布前记得检查、手动重新加');
     }
-    if (tg === 'a' && el.getAttribute('href')) add('info', el, '链接：秀米可能不保留，同步到公众号后记得检查、手动重新加');
+    // 左右滑动：只有 SVG 长图直接放在滑动容器里（44C 写法）走完三步才正常
+    if (/^(auto|scroll)$/.test(s.overflowX) || /^(auto|scroll)$/.test(s.overflow)){
+      const sv = el.querySelector('svg');
+      if (!sv) add('warn', el, '左右滑动里放的是普通 HTML 块：走完秀米再存回公众号会出问题。请改成一张宽 SVG 长图（SVG 直接写 width:400%;max-width:none）');
+      else if (sv.parentElement !== el) add('warn', el, '左右滑动的 SVG 外面又包了一层：公众号会把宽度压回屏幕宽，滑不动。请把 SVG 直接放进滑动容器，SVG 自己写 width:400%;max-width:none');
+    }
+    // 定位：微信会删 position / z-index
+    if (/^(absolute|relative|fixed|sticky)$/.test(s.position))
+      add('warn', el, 'position:' + s.position + ' 定位：微信会删掉，角标会跑到图片下面或被图片盖住。角标请用「图片做背景、角标写在里面」的写法', null, ['position']);
     // 裸文字 / 零宽字符（按所在的块统计）
     if (!INLINE.test(tg) && !NO_TEXT_PARENT.test(tg)){
       const bare = [...el.childNodes].filter(t => t.nodeType === 3 && t.nodeValue.replace(ZW_G, '').trim());
-      if (bare.length) add('warn', el, '文字没套行内标签：「' + bare[0].nodeValue.trim().slice(0, 12) + '」开头会被秀米加空格。可自动套 <span>', () => wrapBare(el, false));
+      if (bare.length) add('info', el, '文字没套行内标签：「' + bare[0].nodeValue.trim().slice(0, 12) + '」写法规则要求每段文字套行内标签。可自动套 <span>', () => wrapBare(el, false));
     }
   });
-  if (svgs.length) add('info', svgs[0], (svgs.length > 1 ? '共 ' + svgs.length + ' 个 SVG：' : 'SVG ') + '在秀米里只能整块删，不能编辑；导入和公众号显示都正常');
+  if (svgs.length) add('info', svgs[0], (svgs.length > 1 ? '共 ' + svgs.length + ' 个 SVG：' : 'SVG ') + '公众号显示正常；在秀米里只能整块删，不能编辑');
   // 零宽字符：按所在的块报一次
   const zwBlocks = new Set(), w = doc.createTreeWalker(body, NodeFilter.SHOW_TEXT);
   for (let n; (n = w.nextNode());) if (ZW.test(n.nodeValue) && !inSvg(n.parentElement)) zwBlocks.add(blockOf(n) || n.parentElement);
-  zwBlocks.forEach(b => add('warn', b, '有看不见的零宽字符：在段落开头会被秀米加空格。可自动删掉', () => {
+  zwBlocks.forEach(b => add('info', b, '有看不见的零宽字符：段落开头可能多出空格。可自动删掉', () => {
     const t = doc.createTreeWalker(b, NodeFilter.SHOW_TEXT); for (let n; (n = t.nextNode());) n.nodeValue = n.nodeValue.replace(ZW_G, '');
   }));
   const rank = {err: 0, warn: 1, info: 2};
@@ -1523,15 +1652,23 @@ function xmAudit(){
   return out.sort((a, b) => a.el === b.el ? rank[a.lv] - rank[b.lv] : (a.el.compareDocumentPosition(b.el) & 4 ? -1 : 1));
 }
 const LV_ICON = {err: '⛔', warn: '⚠️', info: 'ℹ️'};
+function xmBadgeUpd(list){
+  const b = $('#xmBadge'); if (!b) return;
+  const c = {err: 0, warn: 0, info: 0}; (list || []).forEach(x => c[x.lv]++);
+  b.className = 'badge' + (c.err ? ' err' : c.warn ? ' warn' : doc ? ' ok' : '');
+  b.textContent = c.err ? c.err : c.warn ? c.warn : doc ? '✓' : '';
+  $('#bXm').dataset.tip = c.err + ' 个错误 · ' + c.warn + ' 个提醒 · ' + c.info + ' 个提示';
+  $('#bXm').title = (doc ? '当前：' + $('#bXm').dataset.tip + '\n' : '') + '按公众号草稿路线（粘贴进公众号 → 秀米导入 → 存回公众号）的写法规则检查：列出问题、点一下定位、能修的直接修\n开着时，导出前会自动修复';
+}
 const xmItem = (x, i) => '<div class="xmi" data-xmi="' + i + '"><span class="lv">' + LV_ICON[x.lv] + '</span><span class="ms"><em>' + esc(x.el.tagName.toLowerCase()) + '</em>' + esc(x.msg) + '</span>' + (x.fix ? '<button data-xmfix="' + i + '">修</button>' : '') + '</div>';
 function xmCheck(){
   clearTimeout(xmT);
   const box = $('#xmBox');
   if (!xm || !doc){ box.classList.add('hidden'); xmList = []; return; }
-  xmList = xmAudit();
+  xmList = xmAudit(); xmBadgeUpd(xmList);
   const c = {err: 0, warn: 0, info: 0}; xmList.forEach(x => c[x.lv]++);
   const nf = xmList.filter(x => x.fix).length;
-  let h = '<div class="xmh">🧵 <b>秀米检查</b><span>⛔ ' + c.err + ' · ⚠️ ' + c.warn + ' · ℹ️ ' + c.info + '</span><span class="sp" style="flex:1"></span>' +
+  let h = '<div class="xmh">🧵 <b>发布检查</b><span>⛔ ' + c.err + ' · ⚠️ ' + c.warn + ' · ℹ️ ' + c.info + '</span><span class="sp" style="flex:1"></span>' +
     (nf ? '<button data-xmall>一键修复 ' + nf + ' 项</button>' : '') + '<button data-xmre>重新检查</button></div>';
   if (!c.err && !c.warn) h += '<div class="xmok">✅ 没有会出问题的写法' + (c.info ? '，下面是提示' : '') + '</div>';
   h += xmList.slice(0, 200).map(xmItem).join('');
@@ -1547,7 +1684,7 @@ function panelXm(){
   const mine = xmList.map((x, i) => [x, i]).filter(([x]) => x.el === sel);
   if (!mine.length) return;
   const d = document.createElement('div'); d.className = 'xmsel';
-  d.innerHTML = '<div class="xmt">🧵 这个元素在秀米里会出问题</div>' + mine.map(([x, i]) => xmItem(x, i)).join('');
+  d.innerHTML = '<div class="xmt">🧵 这个元素的发布检查问题</div>' + mine.map(([x, i]) => xmItem(x, i)).join('');
   const card = panel.querySelector('.card'); card ? card.after(d) : panel.prepend(d);
   const keys = new Set(mine.flatMap(([x]) => x.keys || []));
   if (keys.size){
@@ -1576,7 +1713,7 @@ function xmFixAll(){
   if (n) xmAfterFix(); else xmCheck();
   return n;
 }
-/* 导出前：秀米模式下先自动修，修不了的提醒一下 */
+/* 导出前：发布检查开着时先自动修，修不了的提醒一下 */
 function xmBeforeExport(){
   if (!xm || !doc) return true;
   if (editing) finishEdit();
@@ -1584,15 +1721,15 @@ function xmBeforeExport(){
   const left = xmList.filter(x => x.lv === 'err');
   if (n) toast('导出前已自动修复 ' + n + ' 处');
   if (!left.length) return true;
-  return confirm('秀米模式：已自动修复 ' + n + ' 处，还有 ' + left.length + ' 个问题修不了：\n\n' +
+  return confirm('发布检查：已自动修复 ' + n + ' 处，还有 ' + left.length + ' 个问题修不了：\n\n' +
     left.slice(0, 8).map(x => '· <' + x.el.tagName.toLowerCase() + '> ' + x.msg.split('。')[0]).join('\n') + (left.length > 8 ? '\n……' : '') +
-    '\n\n仍然导出吗？（取消后可在右侧「秀米检查」里点问题定位）');
+    '\n\n仍然导出吗？（取消后可在右侧「发布检查」里点问题定位）');
 }
 function setXm(on){
   xm = on; localStorage.setItem('pushEditor.xm', on ? '1' : '0');
   $('#bXm').classList.toggle('on', on);
-  if (on){ xmCheck(); toast('秀米模式：已按导入规则检查，导出前会自动修复'); }
-  else { $('#xmBox').classList.add('hidden'); xmList = []; panelXm(); toast('已关闭秀米模式'); }
+  if (on){ xmCheck(); toast('发布检查：已按写法规则检查，导出前会自动修复'); }
+  else { $('#xmBox').classList.add('hidden'); xmList = []; panelXm(); toast('已关闭发布检查'); }
 }
 $('#bXm').onclick = () => setXm(!xm);
 $('#bXm').classList.toggle('on', xm);
@@ -1614,6 +1751,7 @@ xmBox.addEventListener('mouseleave', () => placeHov(null));
 function load(text, name){
   codeEl.value = text; hist = []; hi = -1; pushHist(text); save();
   render(text); updBtns(); toast('已打开' + (name ? '：' + name : ''));
+  setTimeout(() => { if (missingImgs().length) fillDialog(false); }, 600);
 }
 $('#bOpen').onclick = () => $('#file').click();
 $('#file').onchange = e => { const f = e.target.files[0]; if (f) f.text().then(t => load(t, f.name)); e.target.value = ''; };
@@ -1621,14 +1759,32 @@ let dragN = 0;
 addEventListener('dragenter', e => { e.preventDefault(); dragN++; $('#drop').style.display = 'flex'; });
 addEventListener('dragleave', () => { if (--dragN <= 0){ dragN = 0; $('#drop').style.display = 'none'; } });
 addEventListener('dragover', e => e.preventDefault());
-addEventListener('drop', e => { e.preventDefault(); dragN = 0; $('#drop').style.display = 'none'; const f = e.dataTransfer.files[0]; if (f) f.text().then(t => load(t, f.name)); });
+addEventListener('drop', async e => {
+  e.preventDefault(); dragN = 0; $('#drop').style.display = 'none';
+  const fs = [...e.dataTransfer.files], h = fs.find(f => /\.(html?|txt)$/i.test(f.name)), imgs = fs.filter(f => f !== h);
+  if (h){
+    const t = await h.text(); codeEl.value = t; hist = []; hi = -1; pushHist(t); save(); render(t); updBtns();
+    await new Promise(r => setTimeout(r, 600));
+    const n = imgs.length ? await fillImgs(imgs) : 0;
+    toast('已打开：' + h.name + (n ? '，补上 ' + n + ' 张图' : ''));
+    if (missingImgs().length) fillDialog(false);
+  } else if (imgs.length){
+    if (!missingImgs().length) return toast('没有需要补的图（要换某张图，请在属性栏里换）');
+    fillPick(imgs);
+  }
+});
 
 $('#mEdit').onclick = () => setMode('edit');
 $('#mPrev').onclick = () => setMode('preview');
 $('#bReset').onclick = resetAnim;
 $('#bUndo').onclick = () => go(-1);
 $('#bRedo').onclick = () => go(1);
-$('#bSrc').onclick = () => $('#drawer').classList.toggle('hidden');
+$('#bSrc').onclick = () => { const h = $('#drawer').classList.toggle('hidden'); $('#bSrc').classList.toggle('on', !h); };
+const exMenu = $('#exMenu');
+$('#bMore').onclick = e => { e.stopPropagation(); exMenu.classList.toggle('hidden'); $('#bMore').classList.toggle('open', !exMenu.classList.contains('hidden')); };
+exMenu.addEventListener('click', () => { exMenu.classList.add('hidden'); $('#bMore').classList.remove('open'); });
+document.addEventListener('click', e => { if (!e.target.closest('.split')){ exMenu.classList.add('hidden'); $('#bMore').classList.remove('open'); } });
+addEventListener('blur', () => { exMenu.classList.add('hidden'); $('#bMore').classList.remove('open'); });
 $('#wseg').onclick = e => {
   const w = e.target.dataset.w; if (w === undefined) return;
   document.querySelectorAll('#wseg button').forEach(b => b.classList.toggle('on', b === e.target));
@@ -1638,37 +1794,375 @@ $('#wseg').onclick = e => {
 };
 $('#bLocate').onclick = () => { if (!sel) return toast('还没有选中元素'); drawTree(); const on = tree.querySelector('.tree-row.on'); if (on) tree.scrollTop += on.getBoundingClientRect().top - tree.getBoundingClientRect().top - tree.clientHeight / 2; scrollStageTo(sel); };
 $('#bFold').onclick = () => { opened = new WeakSet(); drawTree(); tree.scrollTop = 0; toast(sel ? '已折叠，只展开选中元素所在的一支' : '已全部折叠'); };
-$('#bCopyCode').onclick = () => {
-  if (!xmBeforeExport()) return;
-  const text = codeEl.value;
-  navigator.clipboard.writeText(text).then(() => toast('源码已复制'), () => { codeEl.select(); document.execCommand('copy'); toast('源码已复制'); });
-};
-$('#bCopyRich').onclick = async () => {
-  if (!xmBeforeExport()) return;
-  const body = splitDoc(codeEl.value).body;
+/* ================= 导出：装了扩展 → 发到公众号；没装 → 压缩包 ================= */
+const CRC_T = (() => { const t = new Uint32Array(256); for (let n = 0; n < 256; n++){ let c = n; for (let k = 0; k < 8; k++) c = c & 1 ? 0xEDB88320 ^ (c >>> 1) : c >>> 1; t[n] = c >>> 0; } return t; })();
+function crc32(u){ let c = 0xFFFFFFFF; for (let i = 0; i < u.length; i++) c = CRC_T[(c ^ u[i]) & 255] ^ (c >>> 8); return (c ^ 0xFFFFFFFF) >>> 0; }
+/* 最简单的 zip（不压缩，文件名 UTF-8） */
+function makeZip(files){
+  const enc = new TextEncoder(), parts = [], cen = []; let off = 0;
+  const d = new Date(), tm = (d.getHours() << 11) | (d.getMinutes() << 5) | (d.getSeconds() >> 1), dt = ((d.getFullYear() - 1980) << 9) | ((d.getMonth() + 1) << 5) | d.getDate();
+  files.forEach(f => {
+    const nm = enc.encode(f.name), data = typeof f.data === 'string' ? enc.encode(f.data) : f.data, crc = crc32(data), sz = data.length;
+    const h = new DataView(new ArrayBuffer(30));
+    h.setUint32(0, 0x04034b50, true); h.setUint16(4, 20, true); h.setUint16(6, 0x0800, true); h.setUint16(10, tm, true); h.setUint16(12, dt, true);
+    h.setUint32(14, crc, true); h.setUint32(18, sz, true); h.setUint32(22, sz, true); h.setUint16(26, nm.length, true);
+    parts.push(new Uint8Array(h.buffer), nm, data);
+    const c = new DataView(new ArrayBuffer(46));
+    c.setUint32(0, 0x02014b50, true); c.setUint16(4, 20, true); c.setUint16(6, 20, true); c.setUint16(8, 0x0800, true); c.setUint16(12, tm, true); c.setUint16(14, dt, true);
+    c.setUint32(16, crc, true); c.setUint32(20, sz, true); c.setUint32(24, sz, true); c.setUint16(28, nm.length, true); c.setUint32(42, off, true);
+    cen.push(new Uint8Array(c.buffer), nm);
+    off += 30 + nm.length + sz;
+  });
+  const cs = cen.reduce((a, b) => a + b.length, 0), e = new DataView(new ArrayBuffer(22));
+  e.setUint32(0, 0x06054b50, true); e.setUint16(8, files.length, true); e.setUint16(10, files.length, true); e.setUint32(12, cs, true); e.setUint32(16, off, true);
+  return new Blob([...parts, ...cen, new Uint8Array(e.buffer)], {type: 'application/zip'});
+}
+function dataBytes(u){
+  const i = u.indexOf(','), meta = u.slice(5, i), d = u.slice(i + 1);
+  if (/;base64/i.test(meta)){ const s = atob(d.replace(/\s/g, '')), a = new Uint8Array(s.length); for (let j = 0; j < s.length; j++) a[j] = s.charCodeAt(j); return a; }
+  let t = d; try { t = decodeURIComponent(d); } catch (e){}
+  return new TextEncoder().encode(t);
+}
+const IMG_EXT = {'image/jpeg': 'jpg', 'image/jpg': 'jpg', 'image/png': 'png', 'image/gif': 'gif', 'image/webp': 'webp', 'image/bmp': 'bmp', 'image/svg+xml': 'svg', 'image/avif': 'avif'};
+/* 把本地图片（data: 地址）换成 images/01.jpg，返回 {code, imgs} */
+function extractLocalImgs(){
+  const map = new Map(); let k = 0;
+  const get = (u, where) => {
+    if (!map.has(u)){
+      const m = u.match(/^data:([^;,]+)/i), mime = (m ? m[1] : '').toLowerCase();
+      map.set(u, {url: u, file: 'images/' + String(++k).padStart(2, '0') + '.' + (IMG_EXT[mime] || 'bin'), mime, uses: []});
+    }
+    const x = map.get(u); x.uses.push(where); return x.file;
+  };
+  const code = serialize(b => [b, ...b.querySelectorAll('*')].forEach(el => {
+    const tg = el.tagName.toLowerCase();
+    if (tg === 'img'){ const u = el.getAttribute('src') || ''; if (/^data:/i.test(u)) el.setAttribute('src', get(u, '图片')); }
+    if (tg === 'image'){
+      const u = el.getAttribute('href') || el.getAttribute('xlink:href') || '';
+      if (/^data:/i.test(u)){ const f = get(u, 'SVG 图片'); ['href', 'xlink:href'].forEach(a => { if (el.hasAttribute(a)) el.setAttribute(a, f); }); }
+    }
+    const st = el.getAttribute('style');
+    if (st && /url\(\s*['"]?data:/i.test(st)) el.setAttribute('style', st.replace(BG_RE, (m0, q, u) => /^data:/i.test(u) ? 'url(' + q + get(u, '背景图') + q + ')' : m0));
+  }));
+  return {code, imgs: [...map.values()]};
+}
+async function copyBoth(body){
   try {
     await navigator.clipboard.write([new ClipboardItem({'text/html': new Blob([body], {type: 'text/html'}), 'text/plain': new Blob([body], {type: 'text/plain'})})]);
-    toast('排版已复制，可直接粘贴到公众号编辑器');
-  } catch (err){ toast('浏览器不允许富文本复制，请用「复制源码」'); }
-};
-$('#bSave').onclick = () => {
+    return true;
+  } catch (err){
+    let ok = false;
+    const h = ev => { ev.clipboardData.setData('text/html', body); ev.clipboardData.setData('text/plain', body); ev.preventDefault(); ok = true; };
+    document.addEventListener('copy', h);
+    try { document.execCommand('copy'); } catch (e){} finally { document.removeEventListener('copy', h); }
+    return ok;
+  }
+}
+function download(blob, name){
+  const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = name;
+  document.body.appendChild(a); a.click(); a.remove(); setTimeout(() => URL.revokeObjectURL(a.href), 2000);
+}
+function exportName(){ const d = new Date(), p = n => String(n).padStart(2, '0'); return '推送-' + d.getFullYear() + p(d.getMonth() + 1) + p(d.getDate()) + '-' + p(d.getHours()) + p(d.getMinutes()); }
+/* ================= 补图：本机 / 相对路径的图，按文件名从电脑里选回来 ================= */
+const isBadPath = u => !!u && !/^(data:|(https?:)?\/\/|blob:)/i.test(u.trim());
+const baseName = u => { let s = u.trim().split(/[?#]/)[0].replace(/\\/g, '/'); s = s.slice(s.lastIndexOf('/') + 1); try { s = decodeURIComponent(s); } catch (e){} return s.toLowerCase(); };
+/* 列出所有缺图的地址：[{url, name, items:[imgList 项]}] */
+function missingImgs(){
+  if (!doc) return [];
+  const m = new Map();
+  imgListPlain(doc.body).forEach(x => {
+    if (!isBadPath(x.url)) return;
+    if (!m.has(x.url)) m.set(x.url, {url: x.url, name: baseName(x.url), items: []});
+    m.get(x.url).items.push(x);
+  });
+  return [...m.values()];
+}
+function readAsData(f){ return new Promise((ok, no) => { const r = new FileReader(); r.onload = () => ok(r.result); r.onerror = no; r.readAsDataURL(f); }); }
+/* 用选中的文件补图，返回补上的地址数 */
+async function fillImgs(files){
+  const miss = missingImgs(); if (!miss.length) return 0;
+  const byName = new Map();
+  [...files].forEach(f => { if (/^image\//.test(f.type) || /\.(png|jpe?g|gif|webp|bmp|svg)$/i.test(f.name)) byName.set(f.name.toLowerCase(), f); });
+  let n = 0;
+  for (const g of miss){
+    const f = byName.get(g.name); if (!f) continue;
+    const data = await readAsData(f);
+    g.items.forEach(x => { if (x.el.isConnected) setImg1(x, data); });
+    n++;
+  }
+  if (n){ changed(true); if (xm) xmCheck(); }
+  return n;
+}
+/* 补图窗口：返回 Promise<'go'|'cancel'>（导出时用）；平时打开文件后也会弹 */
+let fillResolve = null;
+function fillDialog(forExport){
+  const miss = missingImgs();
+  if (!miss.length) return Promise.resolve('go');
+  const box = $('#fillBox');
+  const rows = miss.map(g => '<div class="fr"><span class="fn">' + esc(g.name || g.url) + '</span><span class="fu" title="' + esc(g.url) + '">' + esc(g.url) + '</span><span class="fc">' + g.items.length + ' 处</span></div>').join('');
+  box.querySelector('.fl').innerHTML = rows;
+  box.querySelector('.ft').textContent = '有 ' + miss.length + ' 张图找不到（代码里写的是本机路径或相对路径，编辑器读不到）';
+  box.querySelector('[data-fgo]').textContent = forExport ? '不补了，直接导出' : '先不补';
+  box.querySelector('[data-fgo]').classList.toggle('danger', !!forExport);
+  box.querySelector('[data-fcancel]').style.display = forExport ? '' : 'none';
+  box.classList.remove('hidden');
+  return new Promise(ok => { fillResolve = ok; });
+}
+function fillClose(r){ $('#fillBox').classList.add('hidden'); const f = fillResolve; fillResolve = null; if (f) f(r); }
+async function fillPick(files){
+  const n = await fillImgs(files), left = missingImgs().length;
+  toast(n ? '已补上 ' + n + ' 张图' + (left ? '，还差 ' + left + ' 张（文件名对不上）' : '') : '没有对上的图：请选文件名相同的图片');
+  if (!left) fillClose('go'); else if (n) fillDialog(!$('#fillBox [data-fcancel]').style.display);
+}
+$('#fillBox').addEventListener('click', e => {
+  if (e.target.closest('[data-ffiles]')) return $('#fillFiles').click();
+  if (e.target.closest('[data-fdir]')) return $('#fillDir').click();
+  if (e.target.closest('[data-fgo]')) return fillClose('go');
+  if (e.target.closest('[data-fcancel]') || e.target === e.currentTarget) return fillClose('cancel');
+});
+['#fillFiles', '#fillDir'].forEach(id => $(id).onchange = e => { const fs = e.target.files; if (fs && fs.length) fillPick(fs); e.target.value = ''; });
+/* 导出按钮 / Ctrl+S：检测到扩展就发到公众号，否则导出压缩包 */
+function doExport(){
+  if (wxOn()) return mpSend();
+  return doZip(true);
+}
+async function doZip(noExt){
+  if (editing) finishEdit();
   if (!xmBeforeExport()) return;
-  const blob = new Blob([codeEl.value], {type: 'text/html;charset=utf-8'});
-  const a = document.createElement('a'), d = new Date(), p = n => String(n).padStart(2, '0');
-  a.href = URL.createObjectURL(blob);
-  a.download = '推送-' + d.getFullYear() + p(d.getMonth() + 1) + p(d.getDate()) + '-' + p(d.getHours()) + p(d.getMinutes()) + (xm ? '_xiumi' : '') + '.html';
-  a.click(); setTimeout(() => URL.revokeObjectURL(a.href), 1000);
-  toast('已下载');
-};
+  if (await fillDialog(true) === 'cancel') return;
+  const name = exportName();
+  const {code, imgs} = doc ? extractLocalImgs() : {code: codeEl.value, imgs: []};
+  const files = [{name: '代码.html', data: code}], list = [];
+  imgs.forEach(x => {
+    const data = dataBytes(x.url);
+    files.push({name: x.file, data});
+    list.push({file: x.file, mime: x.mime, bytes: data.length, uses: x.uses});
+  });
+  const manifest = {
+    note: '代码.html 里的 images/xx 是本地图片。上传到公众号后，把代码里对应的 images/xx 换成图片地址即可。',
+    code: '代码.html', created: new Date().toISOString(), images: list
+  };
+  /* 文章信息（标题/作者/摘要/封面）一起打包；本地封面存成图片文件 */
+  const meta = Object.assign({}, getMeta());
+  if (/^data:/i.test(meta.cover || '')){
+    const mime = ((meta.cover.match(/^data:([^;,]+)/i) || [])[1] || '').toLowerCase();
+    const f = '封面.' + (IMG_EXT[mime] || 'jpg');
+    files.push({name: f, data: dataBytes(meta.cover)});
+    meta.cover = f;
+  }
+  manifest.meta = meta;
+  files.push({name: '清单.json', data: JSON.stringify(manifest, null, 2)});
+  download(makeZip(files), name + '.zip');
+  toast('已导出压缩包：' + name + '.zip');
+  await mpMsg('已导出压缩包', '文件：<b>' + esc(name) + '.zip</b>（在浏览器的「下载」里）<br>里面有：代码' + (imgs.length ? ' + 本地图片 ' + imgs.length + ' 张' : '') + (meta.cover && !/^https?:/i.test(meta.cover) ? ' + 封面' : '') + ' + 文章信息<br><br><b>请将压缩包发给相关负责人即可。</b>' + (noExt ? '<br><br><small>没检测到 Edge 扩展「公众号推送可视化微调」，所以导出了压缩包。装了扩展的话，点「导出」会直接发到公众号编辑页。</small>' : ''));
+}
+$('#bSave').onclick = () => doExport();
+$('#bZip').onclick = () => doZip(false);
 
 /* ================= 杂项 ================= */
-function save(){ try { localStorage.setItem(LS_KEY, codeEl.value); } catch (e){} }
+function save(){ try { localStorage.setItem(LS_KEY, codeEl.value); const sv = $('#stSaved'); if (sv) sv.textContent = '✓ 已自动保存 ' + new Date().toLocaleTimeString().slice(0, -3); } catch (e){ const sv = $('#stSaved'); if (sv) sv.textContent = '⚠ 内容太大，没能自动保存，记得导出'; } }
 let toastT;
 function toast(t){
   const el = $('#toast'); el.textContent = t; el.classList.add('show');
   clearTimeout(toastT); toastT = setTimeout(() => el.classList.remove('show'), 1800);
   $('#stInfo').textContent = t + '  ' + new Date().toLocaleTimeString();
 }
+
+/* ================= 公众号：发到公众号 / 从公众号读取 / 文章信息 =================
+ * 靠 Edge 扩展「公众号推送可视化微调」（1.5 版起）中转：
+ * 编辑器 postMessage → 扩展 editor-bridge.js → 扩展后台 → 公众号文章编辑页（微信官方 __MP_Editor_JSAPI__ / 编辑页上传接口）
+ */
+const META_KEY = 'pushEditor.meta', MPIMG_KEY = 'pushEditor.mpimg';
+const wxb = {ver: document.documentElement.getAttribute('data-wx-bridge') || '', seq: 0, wait: new Map()};
+addEventListener('message', e => {
+  if (e.source !== window || !e.data) return;
+  const m = e.data;
+  if (m.__wxb === 'ready'){ wxb.ver = m.version || wxb.ver; mpBtns(); }
+  else if (m.__wxb === 'res' && wxb.wait.has(m.id)){ const f = wxb.wait.get(m.id); wxb.wait.delete(m.id); if (m.ok) f.ok(m.data); else f.no(new Error(m.error || '扩展没有回应')); }
+});
+const wxOn = () => !!(wxb.ver || (wxb.ver = document.documentElement.getAttribute('data-wx-bridge') || ''));
+function wxCall(cmd, args, ms){
+  if (!wxOn()) return Promise.reject(new Error('NO_EXT'));
+  return new Promise((ok, no) => {
+    const id = ++wxb.seq;
+    wxb.wait.set(id, {ok, no});
+    postMessage({__wxb: 'req', id, cmd, args: args || {}}, '*');
+    setTimeout(() => { if (wxb.wait.has(id)){ wxb.wait.delete(id); no(new Error('扩展没有回应（超时）')); } }, ms || 90000);
+  });
+}
+function mpBtns(){ ['#bMpSend', '#bMpRead'].forEach(s => { const b = $(s); if (b) b.classList.toggle('off', !wxOn()); }); }
+setTimeout(mpBtns, 300);
+
+/* 通用弹窗 */
+const mpBox = $('#mpBox');
+function mpShow(title, html, btns){
+  mpBox.querySelector('.ft').textContent = title;
+  mpBox.querySelector('.fs').innerHTML = html;
+  const fb = mpBox.querySelector('.fb');
+  fb.innerHTML = '<span class="sp"></span>' + btns.map((b, i) => '<button class="btn' + (b.pri ? ' pri' : '') + '" data-mpi="' + i + '">' + esc(b.t) + '</button>').join('');
+  mpBox.classList.remove('hidden');
+  return new Promise(ok => { fb.onclick = e => { const x = e.target.closest('[data-mpi]'); if (!x) return; mpBox.classList.add('hidden'); fb.onclick = null; ok(btns[+x.dataset.mpi].v); }; });
+}
+const mpMsg = (t, h) => mpShow(t, h, [{t: '知道了', v: 1, pri: 1}]);
+function mpBusy(t, h){ mpBox.querySelector('.ft').textContent = t; mpBox.querySelector('.fs').innerHTML = h; mpBox.querySelector('.fb').innerHTML = ''; mpBox.classList.remove('hidden'); }
+function mpNoExt(){
+  return mpMsg('需要 Edge 扩展', '「发到公众号」「从公众号读取」要靠 Edge 扩展<b>「公众号推送可视化微调」</b>（1.5 版起）中转。<br>· 没装扩展：点「⬇ 导出」会导出压缩包，发给相关负责人。<br>· 已经装了还提示这个：到扩展管理页点扩展的「重新加载」，再刷新本页。<br>· 编辑器是用本机文件打开的（地址以 file:// 开头）：还要在扩展「详细信息」里打开「允许访问文件 URL」。');
+}
+function mpStat(h){
+  h = h || '';
+  const t = h.replace(/<style[\s\S]*?<\/style>/gi, '').replace(/<[^>]+>/g, '').replace(/&nbsp;/g, ' ').replace(/\s+/g, '');
+  return t.length + ' 字 · 图片 ' + (h.match(/<img\b/gi) || []).length + ' 张 · SVG ' + (h.match(/<svg\b/gi) || []).length + ' 个';
+}
+const mpEmpty = h => !/<(img|svg|video|iframe|mpvoice|mp-common)/i.test(h || '') && !(h || '').replace(/<mp-style-type[^>]*>[\s\S]*?<\/mp-style-type>/gi, '').replace(/<[^>]+>/g, '').replace(/&nbsp;|[\s\u200B-\u200D\uFEFF]/g, '');
+
+/* 选择公众号编辑页（只开了一个就直接用） */
+async function mpPick(){
+  const tabs = await wxCall('list');
+  if (!tabs.length) throw new Error('没找到公众号文章编辑页。请先在 Edge 里打开公众号后台，新建一篇文章或打开要改的草稿，再回来点。');
+  if (tabs.length === 1) return tabs[0];
+  const v = await mpShow('选哪个编辑页？', '现在打开了 ' + tabs.length + ' 个公众号文章编辑页：', tabs.map((t, i) => ({t: (t.account || '公众号') + ' ·「' + (t.title || '未命名') + '」', v: i})).concat([{t: '取消', v: -1}]));
+  return v < 0 ? null : tabs[v];
+}
+
+/* 本地图片上传（同一张图只传一次，记在本浏览器里） */
+const mpImgCache = (() => { try { return JSON.parse(localStorage.getItem(MPIMG_KEY) || '{}'); } catch (e){ return {}; } })();
+function imgKey(u){ const b = dataBytes(u); return b.length + '-' + crc32(b).toString(16); }
+async function mpUpload(tabId, dataUrl, name){
+  const k = imgKey(dataUrl);
+  if (mpImgCache[k]) return mpImgCache[k];
+  const r = await wxCall('upload', {tabId, dataUrl, name}, 180000);
+  mpImgCache[k] = r.url;
+  try { localStorage.setItem(MPIMG_KEY, JSON.stringify(mpImgCache)); } catch (e){}
+  return r.url;
+}
+
+/* 文章信息 */
+const META0 = {title: '', author: '', digest: '', cover: ''};
+function getMeta(){ try { return Object.assign({}, META0, JSON.parse(localStorage.getItem(META_KEY) || '{}')); } catch (e){ return Object.assign({}, META0); } }
+function setMeta(m){ try { localStorage.setItem(META_KEY, JSON.stringify(m)); return true; } catch (e){ toast('封面图太大，没能保存，请换小一点的图'); return false; } }
+function metaBadge(){ const m = getMeta(); $('#bMeta').classList.toggle('on', !!(m.title || m.author || m.digest || m.cover)); }
+let metaDraft = null;
+function metaPrev(){ const c = metaDraft.cover, p = $('#mCovPrev'); p.style.backgroundImage = c ? 'url("' + c.replace(/"/g, '%22') + '")' : ''; p.textContent = c ? '' : '未设置'; }
+function metaOpen(){
+  metaDraft = getMeta();
+  $('#mTitle').value = metaDraft.title; $('#mAuthor').value = metaDraft.author; $('#mDigest').value = metaDraft.digest;
+  $('#mCovUrl').value = /^https?:/i.test(metaDraft.cover) ? metaDraft.cover : '';
+  metaPrev(); $('#metaBox').classList.remove('hidden');
+}
+async function shrinkImg(f){
+  const url = await readAsData(f);
+  if (f.size < 1.5e6 || /gif/i.test(f.type)) return url;
+  const im = new Image();
+  await new Promise((ok, no) => { im.onload = ok; im.onerror = no; im.src = url; });
+  const k = Math.min(1, 1600 / im.naturalWidth), c = document.createElement('canvas');
+  c.width = Math.round(im.naturalWidth * k); c.height = Math.round(im.naturalHeight * k);
+  c.getContext('2d').drawImage(im, 0, 0, c.width, c.height);
+  return c.toDataURL('image/jpeg', 0.88);
+}
+$('#bMeta').onclick = metaOpen;
+$('#mCovFile').onclick = () => $('#mCovInput').click();
+$('#mCovInput').onchange = async e => { const f = e.target.files[0]; e.target.value = ''; if (!f) return; metaDraft.cover = await shrinkImg(f); $('#mCovUrl').value = ''; metaPrev(); };
+$('#mCovUrl').oninput = e => { metaDraft.cover = e.target.value.trim(); metaPrev(); };
+$('#mCovClr').onclick = () => { metaDraft.cover = ''; $('#mCovUrl').value = ''; metaPrev(); };
+$('#metaBox').addEventListener('click', e => {
+  if (e.target.closest('[data-mcancel]') || e.target === e.currentTarget){ $('#metaBox').classList.add('hidden'); return; }
+  if (e.target.closest('[data-mok]')){
+    metaDraft.title = $('#mTitle').value.trim(); metaDraft.author = $('#mAuthor').value.trim(); metaDraft.digest = $('#mDigest').value.trim();
+    if (setMeta(metaDraft)){ $('#metaBox').classList.add('hidden'); metaBadge(); toast('文章信息已保存'); }
+  }
+});
+metaBadge();
+
+/* 发到公众号 */
+async function mpSend(){
+  if (editing) finishEdit();
+  if (!wxOn()) return mpNoExt();
+  if (!xmBeforeExport()) return;
+  if (await fillDialog(true) === 'cancel') return;
+  try {
+    mpBusy('发到公众号', '正在找公众号编辑页…');
+    const tab = await mpPick();
+    if (!tab){ mpBox.classList.add('hidden'); return; }
+    if (!tab.ready) throw new Error('那个编辑页还没加载好，请刷新公众号编辑页再试。');
+    mpBusy('发到公众号', '正在检查编辑页…');
+    const cur = await wxCall('getContent', {tabId: tab.tabId});
+    if (!mpEmpty(cur.content)){
+      const go = await mpShow('编辑页里已经有正文', '<b>' + esc(cur.account || '') + '</b>「' + esc(cur.title || '未命名') + '」里已经有内容（' + mpStat(cur.content) + '），发送后会<b>整篇替换</b>正文。<br>想留底的话，先在那边点「保存为草稿」，之后能在「历史版本」里找回。', [{t: '取消', v: 0}, {t: '替换', v: 1, pri: 1}]);
+      if (!go) return;
+    }
+    const {code, imgs} = doc ? extractLocalImgs() : {code: codeEl.value, imgs: []};
+    let body = splitDoc(code).body;
+    const meta = getMeta(), covLocal = /^data:/i.test(meta.cover);
+    const total = imgs.length + (covLocal ? 1 : 0);
+    let n = 0;
+    for (const x of imgs){
+      mpBusy('发到公众号', '上传本地图片 ' + (++n) + ' / ' + total + '…<br><small>传到微信图床（不占图片库）</small>');
+      const u = await mpUpload(tab.tabId, x.url, x.file.split('/').pop());
+      body = body.split(x.file).join(u);
+    }
+    let covUrl = meta.cover;
+    if (covLocal){
+      mpBusy('发到公众号', '上传封面 ' + (++n) + ' / ' + total + '…');
+      covUrl = await mpUpload(tab.tabId, meta.cover, 'cover.' + (IMG_EXT[((meta.cover.match(/^data:([^;,]+)/i) || [])[1] || '').toLowerCase()] || 'jpg'));
+    }
+    mpBusy('发到公众号', '正在写入正文…');
+    await wxCall('setContent', {tabId: tab.tabId, html: body});
+    const notes = [];
+    if (meta.title || meta.author || meta.digest){
+      const done = await wxCall('setMeta', {tabId: tab.tabId, meta: {title: meta.title, author: meta.author, digest: meta.digest}}) || [];
+      const miss = ['title', 'author', 'digest'].filter(k => meta[k] && !done.includes(k));
+      if (miss.length) notes.push('⚠️ 没填上：' + miss.map(k => ({title: '标题', author: '作者', digest: '摘要'})[k]).join('、') + '，请到编辑页手动填');
+    }
+    if (covUrl){
+      mpBusy('发到公众号', '正在设置封面…<br><small>微信偶尔转存失败，会自动重试</small>');
+      try { const r = await wxCall('setCover', {tabId: tab.tabId, url: covUrl}, 180000); if (r && r.tries > 1) notes.push('封面重试了 ' + (r.tries - 1) + ' 次才设上'); }
+      catch (e){ notes.push('⚠️ 封面没设上：' + esc(e.message) + '，请到编辑页手动设置'); }
+    }
+    mpBusy('发到公众号', '正在核对…');
+    const back = await wxCall('getContent', {tabId: tab.tabId});
+    const c = back.content || '';
+    const left = (c.match(/(src|href)=["']?(images\/|data:)/gi) || []).length + (c.match(/url\(\s*["']?(images\/|data:)/gi) || []).length;
+    if (left) notes.push('⚠️ 还有 ' + left + ' 处图片没换成网址');
+    wxCall('focus', {tabId: tab.tabId}).catch(() => {});
+    await mpMsg('已发到公众号编辑页', '<b>' + esc(back.account || '') + '</b>「' + esc(back.title || '未命名') + '」<br>正文：' + mpStat(c) + (imgs.length ? '<br>本地图片 ' + imgs.length + ' 张已传到微信图床' : '') + (covUrl ? '<br>封面：已设置' : '') + (notes.length ? '<br>' + notes.join('<br>') : '') + '<br><br>请到编辑页检查，<b>没问题再自己点「保存为草稿」</b>。');
+  } catch (e){
+    if (e.message === 'NO_EXT') return mpNoExt();
+    if (/^没找到公众号文章编辑页/.test(e.message)){
+      const v = await mpShow('没找到公众号编辑页', esc(e.message) + '<br><br>也可以先导出压缩包，发给相关负责人。', [{t: '导出压缩包', v: 1}, {t: '知道了', v: 0, pri: 1}]);
+      if (v) doZip(false);
+      return;
+    }
+    mpMsg('没发成功', esc(e.message));
+  }
+}
+
+/* 从公众号读取 */
+async function mpRead(){
+  if (editing) finishEdit();
+  if (!wxOn()) return mpNoExt();
+  try {
+    mpBusy('从公众号读取', '正在找公众号编辑页…');
+    const tab = await mpPick();
+    if (!tab){ mpBox.classList.add('hidden'); return; }
+    const r = await wxCall('getContent', {tabId: tab.tabId});
+    const content = (r.content || '').replace(/<p[^>]*display:\s*none[^>]*>\s*<mp-style-type[^>]*>\s*<\/mp-style-type>\s*<\/p>/gi, '');
+    if (mpEmpty(content)) throw new Error('那个编辑页的正文是空的。');
+    const before = splitDoc(codeEl.value).body;
+    const go = await mpShow('读回来，替换编辑器内容？', '<b>' + esc(r.account || '') + '</b>「' + esc(r.title || '未命名') + '」<br>公众号里：' + mpStat(content) + '<br>编辑器里：' + mpStat(before) + '<br><br>读回后会替换编辑器当前内容，可以用 ↶ 撤销回来。标题、作者、摘要、封面也会读进「文章信息」。', [{t: '取消', v: 0}, {t: '读回来', v: 1, pri: 1}]);
+    if (!go) return;
+    const p = splitDoc(codeEl.value), text = p.pre ? p.pre + content + p.post : content;
+    codeEl.value = text; pushHist(text); save(); render(text); updBtns();
+    const m = getMeta();
+    ['title', 'author', 'digest', 'cover'].forEach(k => { if (r[k]) m[k] = r[k]; });
+    setMeta(m); metaBadge();
+    toast('已从公众号读回（可撤销）');
+  } catch (e){
+    if (e.message === 'NO_EXT') return mpNoExt();
+    mpMsg('没读成功', esc(e.message));
+  }
+}
+$('#bMpSend').onclick = mpSend;
+$('#bMpRead').onclick = mpRead;
 
 /* 启动 */
 const init = localStorage.getItem(LS_KEY) || SAMPLE;
