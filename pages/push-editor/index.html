@@ -1624,14 +1624,38 @@ function xmAudit(){
     if (tg === 'div') add('info', el, '<div>：写法规则要求用 <section>。可自动改成 <section>', () => replaceTag(el, 'section'));
     if (tg === 'br') add('warn', el, '<br> 换行：写法规则要求不用 <br>。可自动拆成两段', () => fixBr(el));
     const s = el.style;
-    if (/flex/.test(s.display)) add('err', el, 'display:' + s.display + '：连续几行会并成一行变多列。请改成普通段落或表格', null, ['display']);
+    // flex：只有一行的 flex 实测正常（1G/2E）；连续几个 flex 块会并成一行变多列
+    if (/flex/.test(s.display)){
+      const isFx = x => x && x.style && /flex/.test(x.style.display);
+      if (isFx(el.previousElementSibling) || isFx(el.nextElementSibling)) add('err', el, '连续几个 display:flex 块：会并成一行变多列。列表请改成普通段落，并排请用表格', null, ['display']);
+      else if (/wrap/.test(s.flexWrap)) add('warn', el, 'flex-wrap 换行：走完秀米会变成一行多列。多行卡片请一行写一组', null, ['flex-wrap', 'display']);
+    }
+    if (/calc\(/i.test(el.getAttribute('style') || '') && /(^|;)\s*(width|max-width|min-width)\s*:[^;]*calc\(/i.test(el.getAttribute('style') || ''))
+      add('err', el, '宽度用了 calc()：公众号会删掉，这一块会掉到下一行。左窄右宽的并排请用表格（窄格写固定 px，格子写 border:none）', null, ['width']);
+    // inline-block 并排：等宽正常（2A/3A）；宽窄不同会变形（4A 右边被压窄、1C 头像被拉长）
+    {
+      const kids = [...el.children].filter(k => k.style && k.style.display === 'inline-block' && /%$/.test(k.style.width));
+      if (kids.length >= 2){
+        const ws = kids.map(k => parseFloat(k.style.width));
+        if (Math.max(...ws) - Math.min(...ws) > 3) add('warn', el, 'inline-block 并排但宽度不同（' + kids.map(k => k.style.width).join(' + ') + '）：公众号里宽的那块会被压窄或变形。左窄右宽请用表格（格子写 border:none），等宽卡片才用 inline-block');
+      }
+    }
     if (s.marginLeft === 'auto' && s.marginRight === 'auto') add('err', el, 'margin:0 auto 居中：秀米里会缩小并靠左。可自动改成外层 padding / text-align 居中', () => fixAutoMargin(el), ['margin', 'margin-left', 'margin-right']);
     else if (s.width === '100%' && (pxNonZero(s.marginLeft) || pxNonZero(s.marginRight)))
       add('err', el, 'margin 加 width:100%：公众号里会向右溢出' + (/^(img|table)$/.test(tg) ? '' : '。可自动去掉 width:100%（块元素本来就占满一行）'), /^(img|table)$/.test(tg) ? null : () => s.removeProperty('width'), ['width', 'margin', 'margin-left', 'margin-right']);
-    if (s.width === '100%' && s.boxSizing !== 'border-box' && (pxNonZero(s.paddingLeft) || pxNonZero(s.paddingRight) || pxNonZero(s.borderLeftWidth) || pxNonZero(s.borderRightWidth)))
+    const bdL = s.borderLeftStyle && s.borderLeftStyle !== 'none' && s.borderLeftStyle !== 'hidden' && pxNonZero(s.borderLeftWidth);
+    const bdR = s.borderRightStyle && s.borderRightStyle !== 'none' && s.borderRightStyle !== 'hidden' && pxNonZero(s.borderRightWidth);
+    if (s.width === '100%' && s.boxSizing !== 'border-box' && tg !== 'table' && (pxNonZero(s.paddingLeft) || pxNonZero(s.paddingRight) || bdL || bdR))
       add('err', el, 'width:100% 加 padding / 边框却没写 box-sizing:border-box：公众号里会向右溢出。可自动补上', () => { s.boxSizing = 'border-box'; }, ['width', 'box-sizing', 'padding', 'padding-left', 'padding-right']);
-    if (tg === 'table' && isColTable(el)) add('warn', el, '用表格并排卡片：公众号里右边会溢出，或出现淡淡的表格线。可自动改成并排卡片（各 48%、中间留 4%）', () => tableToCols(el));
-    else if (tg === 'table' && el.rows.length === 1 && el.rows[0].cells.length >= 2 && !el.querySelector('table')) add('info', el, '宽窄不同的一行表格（如头像 + 气泡、左图右文）：不是等宽卡片，不自动改。公众号草稿路线上哪种写法稳，正在实测');
+    // 并排用的一行表格：格子写 border:none 就正常（1A/2C/3B/4B/5A 实测）；不写可能出现淡表格线
+    if (tg === 'table' && el.rows.length === 1 && el.rows[0].cells.length >= 2 && !el.querySelector('table')){
+      const cells = [...el.rows[0].cells];
+      const noBd = c => c.style.borderStyle === 'none' || c.style.borderTopStyle === 'none' || /^0/.test(c.style.borderWidth || '') ;
+      if (cells.some(c => !noBd(c))) add('warn', el, '并排用的表格，格子没写 border:none：公众号里可能出现淡淡的表格线。可自动补上', () => {
+        el.style.border = 'none'; el.style.borderCollapse = 'collapse'; el.style.borderSpacing = '0';
+        cells.forEach(c => { c.style.border = 'none'; });
+      });
+    }
     if (tg === 'a' && el.getAttribute('href')){
       const hr = el.getAttribute('href');
       if (/^(https?:)?\/\/mp\.weixin\.qq\.com(\/|$|\?)/i.test(hr) && !/^(https?:)?\/\/mp\.weixin\.qq\.com\/s[\/?]/i.test(hr))
@@ -1641,7 +1665,8 @@ function xmAudit(){
     // 左右滑动：只有 SVG 长图直接放在滑动容器里（44C 写法）走完三步才正常
     if (/^(auto|scroll)$/.test(s.overflowX) || /^(auto|scroll)$/.test(s.overflow)){
       const sv = el.querySelector('svg');
-      if (!sv) add('warn', el, '左右滑动里放的是普通 HTML 块：走完秀米再存回公众号会出问题。请改成一张宽 SVG 长图（SVG 直接写 width:400%;max-width:none）');
+      if (!sv && el.querySelector('table')) add('warn', el, '宽表格放进左右滑动：走完三步能滑，但表格会乱。表格控制在一屏宽（列少一些），或拆成两个表，或做成图片');
+      else if (!sv) add('warn', el, '左右滑动里放的是普通 HTML 块：走完秀米再存回公众号会出问题。请改成一张宽 SVG 长图（SVG 直接写 width:400%;max-width:none）');
       else if (sv.parentElement !== el) add('warn', el, '左右滑动的 SVG 外面又包了一层：公众号会把宽度压回屏幕宽，滑不动。请把 SVG 直接放进滑动容器，SVG 自己写 width:400%;max-width:none');
     }
     // 定位：微信会删 position / z-index
