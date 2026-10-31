@@ -1549,7 +1549,19 @@ function fixAutoMargin(el){
   el.before(wr); wr.appendChild(el);
 }
 /* 一行多格的排版表格 → 并排 inline-block 卡片（10C 写法：各 48%、间隔 4%）。公众号草稿路线上表格会溢出、出现淡表格线 */
-const isColTable = t => { const rs = t.rows; return rs.length === 1 && rs[0].cells.length >= 2 && !t.querySelector('table'); };
+const isColTable = t => {
+  const rs = t.rows;
+  if (rs.length !== 1 || rs[0].cells.length < 2 || t.querySelector('table')) return false;
+  return !isUnevenTable(t);
+};
+/* 一行多格但宽窄不同（如头像 + 气泡、左图右文）：不是等宽并排卡片，不能改成各 48% */
+const isUnevenTable = t => {
+  const cs = [...t.rows[0].cells];
+  if (cs.some(c => /px/i.test(c.style.width) || /^\d+(px)?$/i.test((c.getAttribute('width') || '').trim()))) return true;
+  const ws = cs.map(c => c.getBoundingClientRect().width);
+  if (ws.every(w => w > 0)){ const mx = Math.max(...ws), mn = Math.min(...ws); if (mn < mx * 0.75) return true; }
+  return false;
+};
 function tableToCols(t){
   const cells = [...t.rows[0].cells], n = cells.length, gap = 4;
   const w = +((100 - gap * (n - 1)) / n).toFixed(2);
@@ -1619,6 +1631,7 @@ function xmAudit(){
     if (s.width === '100%' && s.boxSizing !== 'border-box' && (pxNonZero(s.paddingLeft) || pxNonZero(s.paddingRight) || pxNonZero(s.borderLeftWidth) || pxNonZero(s.borderRightWidth)))
       add('err', el, 'width:100% 加 padding / 边框却没写 box-sizing:border-box：公众号里会向右溢出。可自动补上', () => { s.boxSizing = 'border-box'; }, ['width', 'box-sizing', 'padding', 'padding-left', 'padding-right']);
     if (tg === 'table' && isColTable(el)) add('warn', el, '用表格并排卡片：公众号里右边会溢出，或出现淡淡的表格线。可自动改成并排卡片（各 48%、中间留 4%）', () => tableToCols(el));
+    else if (tg === 'table' && el.rows.length === 1 && el.rows[0].cells.length >= 2 && !el.querySelector('table')) add('info', el, '宽窄不同的一行表格（如头像 + 气泡、左图右文）：不是等宽卡片，不自动改。公众号草稿路线上哪种写法稳，正在实测');
     if (tg === 'a' && el.getAttribute('href')){
       const hr = el.getAttribute('href');
       if (/^(https?:)?\/\/mp\.weixin\.qq\.com(\/|$|\?)/i.test(hr) && !/^(https?:)?\/\/mp\.weixin\.qq\.com\/s[\/?]/i.test(hr))
