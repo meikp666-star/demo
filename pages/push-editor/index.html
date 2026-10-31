@@ -1751,9 +1751,17 @@ function xmFixAll(){
   if (n) xmAfterFix(); else xmCheck();
   return n;
 }
-/* 导出前：发布检查开着时先自动修，修不了的提醒一下 */
-function xmBeforeExport(){
-  if (!xm || !doc) return true;
+/* 导出前：发布检查开着时先自动修，修不了的提醒一下；没开时醒目提醒 */
+async function xmBeforeExport(){
+  if (!doc) return true;
+  if (!xm){
+    const v = await mpShow('⚠️ 发布检查没有打开',
+      '<div style="padding:10px 12px;background:#fff1f0;border:1px solid #ffa39e;border-radius:8px;color:#cf1322;"><b>这次导出不会检查写法。</b><br>并排卡片、表格线、溢出、flex 等问题不会被发现和修复，走完「公众号 → 秀米 → 公众号」后可能显示不对。</div><br>建议打开「🧵 发布检查」再导出：能修的自动修，修不了的会列出来。',
+      [{t: '取消', v: 0}, {t: '不检查，直接导出', v: 1}, {t: '打开检查再导出', v: 2, pri: 1}]);
+    if (!v) return false;
+    if (v === 1) return true;
+    setXm(true);
+  }
   if (editing) finishEdit();
   const n = xmFixAll();
   const left = xmList.filter(x => x.lv === 'err');
@@ -1966,7 +1974,7 @@ function doExport(){
 }
 async function doZip(noExt){
   if (editing) finishEdit();
-  if (!xmBeforeExport()) return;
+  if (!(await xmBeforeExport())) return;
   if (await fillDialog(true) === 'cancel') return;
   const name = exportName();
   const {code, imgs} = doc ? extractLocalImgs() : {code: codeEl.value, imgs: []};
@@ -2115,7 +2123,7 @@ metaBadge();
 async function mpSend(){
   if (editing) finishEdit();
   if (!wxOn()) return mpNoExt();
-  if (!xmBeforeExport()) return;
+  if (!(await xmBeforeExport())) return;
   if (await fillDialog(true) === 'cancel') return;
   try {
     mpBusy('发到公众号', '正在找公众号编辑页…');
